@@ -12,85 +12,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css">
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #343a40;
-        }
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background-color: #343a40;
-            border: none;
-            padding: 15px;
-        }
-
-        .nav {
-            display: flex;
-            gap: 50px;
-            align-items: center; /* 수직 정렬 */
-            justify-content: center; /* 수평 가운데 정렬 */
-            flex-grow: 1; /* 공간 차지 */
-        }
-        .nav a, .nav .dropdown-toggle {
-            text-decoration: none;
-            color: #fff; /* 헤더 폰트 색 */
-            font-size: 16px;
-            position: relative;
-            background: none;
-            display: flex;
-            align-items: center;
-            line-height: 1.5; /* 행간 조정 */
-            letter-spacing: 0.5px; /* 자간 조정 */
-        }
-        .nav .dropdown-menu {
-            display: none; /* 기본적으로 숨김 */
-            position: absolute; /* 위치를 절대적으로 설정 */
-            left: 50%; /* 왼쪽을 50%로 설정 */
-            transform: translateX(-50%); /* 왼쪽 위치의 50%만큼 왼쪽으로 이동 */
-            top: 100%; /* 드롭다운 메뉴를 버튼 아래에 위치 */
-            z-index: 1000; /* 다른 요소 위에 보이도록 설정 */
-        }
-        .nav .dropdown-menu.show {
-            display: block; /* 클래스가 show인 경우 보이게 설정 */
-        }
-        .nav a:last-child {
-            margin-left: -5px; /* 원하는 간격으로 조정 */
-        }
-        .nav a.beta {
-            color: #2196F3;
-            background-color: #E3F2FD;
-            padding: 3px 5px;
-            border-radius: 3px;
-        }
-        .nav .dropdown-toggle {
-            outline: none;
-            box-shadow: none;
-            border-color: transparent;
-        }
-        .nav .dropdown-toggle:hover {
-            color: #2196F3; /* 마우스를 올렸을 때 글자색 변경 */
-        }
-        .auth {
-            display: flex;
-            gap: 15px; /* 로그인 버튼과의 간격 조정 */
-            margin-left: 20px; /* 로그인 버튼과의 간격 조정 */
-        }
-        .auth a {
-            text-decoration: none;
-            color: #fff; /* 로그인 텍스트 색상 */
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-        }
-        .auth button {
-            background: none; /* 버튼 배경 없애기 */
-            border: none; /* 버튼 경계선 없애기 */
-            padding: 0; /* 패딩 없애기 */
-            cursor: pointer; /* 커서 모양 변경 */
-        }
+        
         .dropdown-toggle::after {
             content: none; /* 기본 화살표 숨김 */
         }
@@ -103,36 +27,7 @@
             display: inline-block; /* 인라인 블록 요소로 변경 */
             padding: 5px 10px; /* 원하는 패딩 값으로 조정 */
         }
-        footer {
-            background-color: #000; /* 배경색을 bg-dark 클래스로 변경하였으므로 주석 처리 */
-            color: #fff; /* 글자 색상을 흰색으로 변경 */
-            padding: 20px;
-            text-align: center;
-            border-top: 1px solid #ddd;
-        }
-        footer p {
-            margin: 5px 0;
-        }
-        footer .footer-nav {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 10px;
-            text-decoration: underline;
-        }
-        footer .footer-nav a {
-            text-decoration: none;
-            color: #fff; /* 링크 색상을 흰색으로 변경 */
-        }
-        /* SVG 아이콘 드롭다운 위치 수정 */
-        .auth .dropdown-menu {
-            right: 0; /* 오른쪽으로 정렬 */
-            left: auto; /* 기본값은 왼쪽이므로 오른쪽으로 이동 */
-        }
-        /* SVG 아이콘 호버 색상 변경 */
-        .auth .dropdown-toggle:hover svg {
-            fill: #2196F3; /* SVG 아이콘의 색상 변경 */
-        }
+        
 
         /* ====================헤더푸터css끝============================================================== */
 
@@ -366,7 +261,7 @@
 		        </div>
 		    </form>
 		</div>
-		</div>
+		
 		
 <!-- 		댓글 토글 -->
 			<script>
@@ -403,6 +298,9 @@
             <button type="button" onclick="location.href='/Admin/promotionList';" class="btn btn-back">목록으로 돌아가기</button>
         </div>
     </div>
+   </div>
+ 
+
 
     <!-- 푸터 시작 -->
     <%@ include file="/WEB-INF/views/Common/footer.jsp" %>
