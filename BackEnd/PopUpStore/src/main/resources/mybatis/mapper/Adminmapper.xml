@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Mapper파일을 구성하기 위한 Doctype설정 -->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.popup.project.member.dto.UserMapper">
+    <select id="AdmingetAllUsers" resultType="com.popup.project.member.dto.UserDTO">
+	    SELECT user_id AS userId,
+	           user_nick AS userNick,
+	           user_email AS userEmail,
+	           user_phone AS userPhone,
+	           user_address AS userAddress,
+	           user_create_date AS userCreatedate  <!-- 이 부분이 중요합니다. -->
+	    FROM USERS
+	</select>
+	
+	<resultMap id="userResultMap" type="com.popup.project.member.dto.UserDTO">
+	    <result property="userId" column="USER_ID"/>
+	    <result property="userNick" column="USER_NICK"/>
+	    <result property="userEmail" column="USER_EMAIL"/>
+	    <result property="userPhone" column="USER_PHONE"/>
+	    <result property="userAddress" column="USER_ADDRESS"/>
+	    <result property="userCreatedate" column="USER_CREATE_DATE"/>
+	</resultMap>
+	
+	<select id="searchUsersByIdOrNickname" resultMap="userResultMap">
+	  SELECT * FROM USERS
+	  WHERE USER_ID LIKE '%' || #{query} || '%'
+	  OR USER_NICK LIKE '%' || #{query} || '%'
+	</select>
+	
+</mapper>

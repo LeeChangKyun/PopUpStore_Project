@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- PromotionLikeMapper.xml -->
+<mapper namespace="com.popup.project.board.promotion.service.PromotionLikeMapper">
+
+    <!-- 좋아요 추가 -->
+ <insert id="insertLike">
+    INSERT INTO promotion_likes (LIKE_ID, promotion_num, user_nick)
+    VALUES (promotion_likes_seq.NEXTVAL, #{promotionNum}, #{userNick})
+</insert>
+
+    <!-- 좋아요 삭제 -->
+    <delete id="deleteLike">
+        DELETE FROM promotion_likes
+        WHERE promotion_num = #{promotionNum} AND user_nick = #{userNick}
+    </delete>
+
+    <!-- 좋아요 여부 확인 -->
+    <select id="checkLike" resultType="int">
+        SELECT COUNT(*)
+        FROM promotion_likes
+        WHERE promotion_num = #{promotionNum} AND user_nick = #{userNick}
+    </select>
+
+    <!-- 좋아요 수 조회 -->
+    <select id="getLikeCount" resultType="int">
+        SELECT COUNT(*)
+        FROM promotion_likes
+        WHERE promotion_num = #{promotionNum}
+    </select>
+
+</mapper>
