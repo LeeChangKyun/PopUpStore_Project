@@ -37,3 +37,28 @@ minvalue 1
 nomaxvalue      
 nocycle         
 nocache;      
+
+
+
+--inquiry 좋아요 테이블 생성
+CREATE TABLE INQUIRY_LIKES (
+    like_id NUMBER PRIMARY KEY,
+    inquiry_num NUMBER NOT NULL,
+    user_nick VARCHAR2(100) NOT NULL,
+    like_date DATE DEFAULT SYSDATE NOT NULL,
+    CONSTRAINT fk_like_inquirynew FOREIGN KEY(inquiry_num) REFERENCES INQUIRY_BOARD(inquiry_num)
+    ON DELETE CASCADE,
+    CONSTRAINT fk_like_usernew FOREIGN KEY(user_nick) REFERENCES USERS(user_nick)
+    ON DELETE CASCADE
+);
+
+-- inquiry 좋아요 시퀀스 생성
+CREATE SEQUENCE inquiry_likes_seq
+INCREMENT BY 1
+START WITH 1
+MINVALUE 1
+NOMAXVALUE
+NOCYCLE
+NOCACHE;
+
+commit;
