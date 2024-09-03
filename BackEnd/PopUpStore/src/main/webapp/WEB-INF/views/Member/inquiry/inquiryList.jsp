@@ -94,7 +94,7 @@
         .search-bar {
             /* 검색 바를 수직으로 중앙에 배치하고, 상하 패딩 및 배경색 설정 */
             display: flex;s
-            flex-direction: column;
+           	flex-direction: column;
             justify-content: center;
             align-items: center;
             padding: 20px;
@@ -114,12 +114,11 @@
             margin-right: 10px;
         }
 
-        .search-bar input[type="text"] {
-            /* 검색 입력창의 높이와 너비를 설정하고, 오른쪽 여백 추가 */
-            height: 38px;
-            margin-right: 10px;
-            width: 250px;
-        }
+        .container .search-bar input[type="text"] {
+		    height: 38px;
+		    margin-right: 30px;
+		    width: 500px !important; /* 우선순위를 높이기 위해 !important 사용 */
+		}
 
         .search-bar button {
             /* 버튼의 여백을 설정하여 텍스트와 버튼의 경계를 좁게 조정 */
@@ -305,7 +304,7 @@
 				                (((maps.pageNum-1) * maps.pageSize)	+ loop.index)}" />
 				            	${vNum}
 				            </td>
-				            <td align="left"> 
+				            <td align="center"> 
 				                <a href="/Member/inquiry/inquiryView?inquiry_num=${row.inquiry_num}&vNum=${vNum}">${ row.inquiry_title }</a> 
 				            </td> 
 				            <td>${ row.user_nick }</td> 
