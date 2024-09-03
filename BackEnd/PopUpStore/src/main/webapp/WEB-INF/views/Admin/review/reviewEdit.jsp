@@ -173,11 +173,15 @@
             }
         }
 
-        function deleteFile() {
-            if (confirm("현재 파일을 삭제하시겠습니까?")) {
+        function deleteFileHandler() {
+            const confirmDelete = confirm("현재 파일을 삭제하시겠습니까?");
+            if (confirmDelete) {
                 document.getElementById("deleteFile").value = "true";
                 document.getElementById("existingFileText").innerText = "삭제 완료";
                 document.getElementById("deleteFileButton").disabled = true;
+                alert("파일이 삭제되었습니다.");
+            } else {
+                alert("파일 삭제가 취소되었습니다.");
             }
         }
     </script>
@@ -202,10 +206,17 @@
                 <textarea name="reviewContent">${dto.reviewContent}</textarea>
             </div>
             <div class="mb-3">
-                <label for="reviewOfile" class="form-label">첨부 파일</label>
-                <input type="file" name="reviewOfile" />
-
-            </div>
+	            <label for="reviewOfile" class="form-label">첨부 파일</label>
+	            <c:choose>
+	                <c:when test="${dto.reviewOfile != null}">
+	                    <p id="existingFileText">${dto.reviewOfile}</p>
+						<button type="button" class="btn btn-danger" id="deleteFileButton" onclick="deleteFileHandler()">파일 삭제</button>
+	                </c:when>
+	                <c:otherwise>
+	                    <input type="file" name="reviewOfile" />
+	                </c:otherwise>
+	            </c:choose>
+	        </div>
             <div class="text-center">
                 <button type="submit" class="submit-button">수정 완료</button>
                 <button type="reset" class="reset-button">초기화</button>
@@ -213,6 +224,7 @@
             </div>
         </form>
     </div>
+    
     <%@ include file="/WEB-INF/views/Common/footer.jsp" %>
     
     <script>

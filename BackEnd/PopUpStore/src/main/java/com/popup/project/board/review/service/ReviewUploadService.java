@@ -52,10 +52,16 @@ public class ReviewUploadService {
           .collect(Collectors.toList());
     }
 
-    public void deleteFile(String filename) {
-        File file = new File(UPLOAD_DIR + "/" + filename);
-        if (file.exists()) {
-            file.delete();
+    public void deleteFile(String fileName) {
+        if (fileName != null && !fileName.isEmpty()) {
+            File file = new File("파일저장경로/" + fileName);
+            if (file.exists()) {
+                if (file.delete()) {
+                    System.out.println("파일이 성공적으로 삭제되었습니다.");
+                } else {
+                    System.out.println("파일 삭제에 실패하였습니다.");
+                }
+            }
         }
     }
 }

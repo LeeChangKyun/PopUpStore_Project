@@ -1,7 +1,9 @@
 package com.popup.project.board.review.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -99,23 +102,35 @@ public class ReviewController {
     public String reviewViewPost(
             @PathVariable("role") String role, 
             @RequestParam("reviewNum") int reviewNum, 
-            Model model) {
+            Model model,
+            HttpSession session) {
 
         ReviewBoard post = reviewBoardService.getPostById(reviewNum);
         List<ReviewComment> comments = reviewCommentService.getCommentsByReviewNum(reviewNum);
         
-        // getFormattedCommentDate를 사용하여 코멘트 날짜를 가져옵니다.
+        // 세션에서 사용자 정보를 가져옵니다.
+        String userNick = (String) session.getAttribute("userNick");
+
+        // 비회원 사용자 처리
+        boolean isLiked = false;
+        if (userNick != null) {
+            // 해당 사용자가 이 게시물에 좋아요를 눌렀는지 확인
+            isLiked = reviewBoardService.isUserLikedPost(reviewNum, userNick);
+        }
+
+        // 댓글의 날짜 형식을 설정합니다.
         comments.forEach(comment -> {
             String formattedDate = comment.getFormattedCommentDate();
             comment.setFormattedCommentDate(formattedDate);
         });
 
+        // 모델에 데이터를 추가합니다.
         model.addAttribute("dto", post);
         model.addAttribute("comments", comments);
+        model.addAttribute("isLiked", isLiked); // 사용자가 좋아요를 눌렀는지 여부를 추가
 
         return role + "/review/reviewView";
     }
-
     
     @GetMapping("/Member/review/reviewWrite")
     public String MemberReviewWriteGet() {
@@ -275,9 +290,9 @@ public class ReviewController {
 
         String userNick = (String) request.getSession().getAttribute("userNick");
 
-        // 작성자 검증 (관리자는 모든 게시글 수정 가능)
+        // 작성자 검증
         ReviewBoard review = reviewBoardService.getPostById(reviewNum);
-        if (review == null) {
+        if (review == null || (!review.getUserNick().equals(userNick) && !userNick.equals("관리자"))) {
             return "redirect:/Admin/review/reviewList";
         }
 
@@ -300,7 +315,7 @@ public class ReviewController {
             review.setReviewOfile(existingFile); // 기존 파일 유지
         }
 
-        reviewBoardService.editPost(review);
+        reviewBoardService.editPost(review);  // 수정된 파일 정보로 DB 업데이트
 
         return "redirect:/Admin/review/reviewView?reviewNum=" + reviewNum;
     }
@@ -362,11 +377,39 @@ public class ReviewController {
         return "success";
     }
 
-    @PostMapping("/toggleLike")
-    @ResponseBody
-    public String toggleLike(@RequestParam("reviewNum") int reviewNum, @RequestParam("userNick") String userNick) {
-        boolean liked = reviewLikesService.toggleLike(reviewNum, userNick); 
-        return liked ? "liked" : "unliked";
+    @PostMapping("/review/addLike")
+    public String addLike(@RequestParam("reviewNum") int reviewNum,
+                          @SessionAttribute("userNick") String userNick) {
+        reviewLikesService.addLike(reviewNum, userNick);
+        return "redirect:/reviewView?reviewNum=" + reviewNum; 
+    }
+
+    @PostMapping("/review/deleteLike")
+    public String deleteLike(@RequestParam("reviewNum") int reviewNum,
+                             @SessionAttribute("userNick") String userNick) {
+        reviewLikesService.deleteLike(reviewNum, userNick);
+        return "redirect:/reviewView?reviewNum=" + reviewNum; 
     }
     
+    @PostMapping("/review/toggleLike")
+    @ResponseBody
+    public Map<String, Object> toggleLike(@RequestParam("reviewNum") int reviewNum,
+                                           @RequestParam("userNick") String userNick) {
+        boolean userLiked = reviewLikesService.isLiked(reviewNum, userNick);
+
+        if (userLiked) {
+            reviewLikesService.deleteLike(reviewNum, userNick);
+        } else {
+            reviewLikesService.addLike(reviewNum, userNick);
+        }
+
+        int likeCount = reviewLikesService.getLikeCount(reviewNum);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("likeCount", likeCount);
+        response.put("userLiked", !userLiked); // 응답에 토글된 상태 포함
+
+        return response;
+    }
+
 }

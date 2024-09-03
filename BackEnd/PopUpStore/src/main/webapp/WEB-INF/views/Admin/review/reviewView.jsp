@@ -14,6 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <style>
         body {
             background-color: #343a40;
@@ -108,6 +109,7 @@
         }
     </style>
     <script type="text/javascript">
+    
 	    function confirmReviewEdit(reviewNum) {
 	        if (confirm("게시글을 수정하시겠습니까?")) {
 	            window.location.href = "/Admin/review/reviewEdit?reviewNum=" + reviewNum;
@@ -166,34 +168,69 @@
 	        }
 	    }
         // 좋아요 기능...
-	    function toggleLike(reviewNum) {
-	        const userNick = '${sessionScope.userNick}';
-
-	        fetch('/toggleLike', {
-	            method: 'POST',
-	            headers: {
-	                'Content-Type': 'application/x-www-form-urlencoded',
-	            },
-	            body: new URLSearchParams({
-	                reviewNum: reviewNum,
-	                userNick: userNick
-	            })
-	        })
-	        .then(response => response.text())
-	        .then(result => {
-	            const likeBtn = document.getElementById('likeBtn');
-	            const likeCount = document.getElementById('likeCount');
-
-	            if (result === 'liked') {
-	                likeBtn.textContent = '좋아요';
-	                likeCount.textContent = parseInt(likeCount.textContent) + 1;
-	            } else if (result === 'unliked') {
-	                likeBtn.textContent = '싫어요';
-	                likeCount.textContent = parseInt(likeCount.textContent) - 1;
+        document.addEventListener("DOMContentLoaded", function() {
+	        const likeIcon = document.getElementById('likeIcon');
+	        const likeCount = document.getElementById('likeCount');
+	        
+	        // 서버에서 전달된 초기 값
+	        const initialLikeCount = ${dto.reviewLikecount}; // 서버에서 전달된 좋아요 수
+	        const isLiked = "${isLiked}" === "true"; // 서버에서 전달된 사용자의 좋아요 여부
+	
+	        // 초기 상태 설정
+	        likeCount.textContent = initialLikeCount;
+	        if (isLiked) {
+	            likeIcon.className = 'fas fa-heart';
+	            likeIcon.style.color = 'red';
+	        } else {
+	            likeIcon.className = 'far fa-heart';
+	            likeIcon.style.color = 'black';
+	        }
+	
+	        // 좋아요 버튼 클릭 이벤트 핸들러
+	        likeIcon.addEventListener('click', function() {
+	            const reviewNum = ${dto.reviewNum};
+	            toggleLike(reviewNum);
+	        });
+	
+	        function toggleLike(reviewNum) {
+	            const userNick = '<%= (String) session.getAttribute("userNick") %>'; // 세션에서 직접 가져오기
+	            if (!userNick) {
+	                console.error("User nickname is not available.");
+	                return;
 	            }
-	        })
-	        .catch(error => console.error('Error:', error));
-	    }
+	
+	            fetch('/review/toggleLike', {
+	                method: 'POST',
+	                headers: {
+	                    'Content-Type': 'application/x-www-form-urlencoded',
+	                },
+	                body: new URLSearchParams({
+	                    reviewNum: reviewNum,
+	                    userNick: userNick
+	                })
+	            })
+	            .then(response => response.json())
+	            .then(data => {
+	                let currentCount = parseInt(likeCount.textContent);
+	
+	                if (!isNaN(currentCount)) {
+	                    if (data.userLiked) {
+	                        likeIcon.className = 'fas fa-heart';
+	                        likeIcon.style.color = 'red';
+	                        likeCount.textContent = currentCount + 1;
+	                    } else {
+	                        likeIcon.className = 'far fa-heart';
+	                        likeIcon.style.color = 'black';
+	                        likeCount.textContent = currentCount - 1;
+	                    }
+	                } else {
+	                    console.error("좋아요 수를 가져오는 데 문제가 발생했습니다.");
+	                    likeCount.textContent = data.likeCount; // 서버에서 받은 실제 좋아요 수로 업데이트
+	                }
+	            })
+	            .catch(error => console.error('Error:', error));
+	        }
+	    });
     </script>
 </head>
 <body>
@@ -216,19 +253,19 @@
             </c:otherwise>
         </c:choose>
 
-		<%-- <!-- w좋아요 -->
-	    <button id="likeBtn" onclick="toggleLike(${dto.reviewNum})">
-		    ${isLiked ? '싫어요' : '좋아요'}
-		</button>
-		<span id="likeCount">${dto.reviewLikecount}</span>> --%>
-
-        <div class="icon-group">
-		    <!-- 좋아요 하트 아이콘 -->
-			<i id="likeIcon" class="fa${dto.reviewLikecount > 0 ? 's' : 'r'} fa-heart" onclick="toggleLike(${dto.reviewNum})" style="color: ${dto.reviewLikecount > 0 ? 'red' : 'black'};"></i>
+        <!-- 좋아요 아이콘을 렌더링할 때 isLiked 값에 따라 초기 상태를 설정 -->
+		<div class="icon-group">
+		    <!-- 좋아요 아이콘 -->
+		    <i id="likeIcon" class="fa${isLiked ? 's' : 'r'} fa-heart" 
+		       onclick="toggleLike(${post.reviewNum})" 
+		       style="color: ${isLiked ? 'red' : 'black'};"></i>
+		    
+		    <!-- 좋아요 개수 -->
 		    <p id="likeCount">${dto.reviewLikecount}</p>
+		    
 		    <!-- 댓글 아이콘 -->
 		    <i class="fas fa-comment-dots"></i>
-		    <p>${comments.size()}</p>
+			<p>${comments.size()}</p>		
 		</div>
 
         <div class="comment-section">
@@ -278,11 +315,14 @@
         </form>
 
         <div class="text-center mt-5">
-            <button type="button" class="btn btn-warning" onclick="confirmReviewEdit(${dto.reviewNum})">수정하기</button>
-            <button type="button" class="btn btn-danger" onclick="confirmReviewDelete(${dto.reviewNum})">삭제하기</button>
-            <button type="button" class="btn btn-secondary" onclick="location.href='/Admin/review/reviewList';">목록으로</button>
-        </div>
+		    <c:if test="${dto.userNick == sessionScope.userNick}">
+		        <button type="button" class="btn btn-warning" onclick="confirmReviewEdit(${dto.reviewNum})">수정하기</button>
+		    </c:if>
+		    <button type="button" class="btn btn-danger" onclick="confirmReviewDelete(${dto.reviewNum})">삭제하기</button>
+		    <button type="button" class="btn btn-secondary" onclick="location.href='/Admin/review/reviewList';">목록으로</button>
+		</div>
     </div>
+    
     <%@ include file="/WEB-INF/views/Common/footer.jsp" %>
     
     <script>

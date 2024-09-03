@@ -14,6 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <style>
         body {
             background-color: #343a40;
@@ -107,6 +108,14 @@
             color: #333;
         }
     </style>
+    <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        const likeIcon = document.getElementById('likeIcon');
+        const likeCount = document.getElementById('likeCount');
+        
+        // 서버에서 전달된 초기 값
+        const initialLikeCount = ${dto.reviewLikecount}; // 서버에서 전달된 좋아요 수
+	</script>
 </head>
 <body>
     <div class="container-custom">
@@ -128,13 +137,19 @@
             </c:otherwise>
         </c:choose>
 
-        <div class="icon-group">
-		    <!-- 좋아요 하트 아이콘 (게스트는 클릭 불가능) -->
-		    <i id="likeIcon" class="fa${dto.reviewLikecount > 0 ? 's' : 'r'} fa-heart" style="color: ${dto.reviewLikecount > 0 ? 'red' : 'black'}; cursor: not-allowed;"></i>
+        <!-- Guest 는 좋아요 기능 사용 불가 -->
+		<div class="icon-group">
+		    <!-- 좋아요 아이콘 -->
+		    <i id="likeIcon" class="fa${isLiked ? 's' : 'r'} fa-heart" 
+		       onclick="toggleLike(${post.reviewNum})" 
+		       style="color: ${isLiked ? 'red' : 'black'};"></i>
+		    
+		    <!-- 좋아요 개수 -->
 		    <p id="likeCount">${dto.reviewLikecount}</p>
+		    
 		    <!-- 댓글 아이콘 -->
 		    <i class="fas fa-comment-dots"></i>
-		    <p>${comments.size()}</p>
+			<p>${comments.size()}</p>		
 		</div>
 
         <!-- 댓글 리스트 -->
@@ -170,6 +185,7 @@
             <button type="button" class="btn btn-secondary" onclick="location.href='/Guest/review/reviewList';">목록으로</button>
         </div>
     </div>
+    
     <%@ include file="/WEB-INF/views/Common/footer.jsp" %>
     
     <script>

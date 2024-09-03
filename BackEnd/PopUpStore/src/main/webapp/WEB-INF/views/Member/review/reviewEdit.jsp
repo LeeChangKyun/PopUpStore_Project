@@ -213,6 +213,7 @@
             </div>
         </form>
     </div>
+    
     <%@ include file="/WEB-INF/views/Common/footer.jsp" %>
     
     <script>
