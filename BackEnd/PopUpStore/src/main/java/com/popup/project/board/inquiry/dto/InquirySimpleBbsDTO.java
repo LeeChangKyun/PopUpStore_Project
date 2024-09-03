@@ -18,6 +18,7 @@ public class InquirySimpleBbsDTO
 	private String inquiry_sfile;    // 저장된 파일명
 	private int downcount;
 	private int visitcount; // 조회수
+	private int likeCount;
 	
 	
 }

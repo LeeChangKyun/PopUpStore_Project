@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -22,12 +23,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.popup.project.board.inquiry.dto.InquiryDTO;
 import com.popup.project.board.inquiry.dto.InquirySimpleBbsDTO;
 import com.popup.project.board.inquiry.dto.inquiryCommentDTO;
-import com.popup.project.board.inquiry.service.InquirysBoardService;
 import com.popup.project.board.inquiry.service.InquiryFileDownService;
+import com.popup.project.board.inquiry.service.InquiryLikeService;
 import com.popup.project.board.inquiry.service.InquiryPagingService;
+import com.popup.project.board.inquiry.service.InquirysBoardService;
 import com.popup.project.board.inquiry.service.inquiryCommentService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class InquiryController {
@@ -44,6 +47,9 @@ public class InquiryController {
     
     @Autowired
     private inquiryCommentService commentService;
+    
+    @Autowired
+    private InquiryLikeService inquiryLikeService;
 
     @RequestMapping("{role}/inquiry/inquiryList")
     public String boardList(Model model, HttpServletRequest req, InquiryDTO inquiryDTO, @PathVariable("role") String role)
@@ -146,8 +152,13 @@ public class InquiryController {
     
     
 
-    @GetMapping("/{role}/inquiry/inquiryView")
-    public String boardView(Model model, @RequestParam("inquiry_num") String inquiryNum, @PathVariable("role") String role) {
+    @GetMapping("/Member/inquiry/inquiryView")
+    public String boardView(Model model, @RequestParam("inquiry_num") String inquiryNum, HttpSession session) {
+        
+        Long inquiryNumLong = Long.parseLong(inquiryNum); 
+        // 사용자 닉네임 가져오기
+        String userNick = (String) session.getAttribute("userNick");
+        
         InquirySimpleBbsDTO inquirysimplebbsDTO = new InquirySimpleBbsDTO();
         inquirysimplebbsDTO.setInquiry_num(inquiryNum);
 
@@ -156,6 +167,13 @@ public class InquiryController {
         inquirysimplebbsDTO = boardService.getBoardView(inquirysimplebbsDTO);
         inquirysimplebbsDTO.setInquiry_content(inquirysimplebbsDTO.getInquiry_content().replace("\r\n", "<br/>"));
 
+        
+        // 좋아요 개수 조회
+        int likeCount = inquiryLikeService.getLikeCount(Long.parseLong(inquiryNum));
+        inquirysimplebbsDTO.setLikeCount(likeCount);
+        // 현재 사용자의 좋아요 상태 확인
+        boolean userLiked = inquiryLikeService.isLiked(inquiryNumLong, userNick);
+        
         // 댓글 조회
         List<inquiryCommentDTO> comments = commentService.getCommentsByInquiryNum(inquiryNum);
         
@@ -165,7 +183,50 @@ public class InquiryController {
         model.addAttribute("inquirysimplebbsDTO", inquirysimplebbsDTO);
         model.addAttribute("comments", comments);
         model.addAttribute("commentCount", commentCount);
-        return role + "/inquiry/inquiryView";
+        return "/Member/inquiry/inquiryView";
+    }
+    
+    
+    @PostMapping("/inquiry/addLike")
+    public String addLike(@RequestParam("iquiry_num") Long inquiryNum,
+                          @SessionAttribute("userNick") String userNick) {
+    	inquiryLikeService.addLike(inquiryNum, userNick);
+        return "redirect:/Member/inquiry/inquiryView?inquiry_num=" + inquiryNum;
+    }
+
+    @PostMapping("/inquiry/removeLike")
+    public String removeLike(@RequestParam("inquiry_num") Long inquiryNum,
+                             @SessionAttribute("userNick") String userNick) {
+    	inquiryLikeService.removeLike(inquiryNum, userNick);
+        return "redirect:/Member/inquiry/inquiryView?inquiry_num=" + inquiryNum;
+    }
+    
+    @PostMapping("/inquiry/toggleLike")
+    @ResponseBody
+    public Map<String, Object> toggleLike(@RequestParam("inquiryNum") Long inquiryNum,
+                                           @RequestParam("userNick") String userNick) {
+        boolean userLiked = inquiryLikeService.isLiked(inquiryNum, userNick);
+
+        if (userLiked) {
+        	inquiryLikeService.removeLike(inquiryNum, userNick);
+        } else {
+        	inquiryLikeService.addLike(inquiryNum, userNick);
+        }
+
+        int likeCount = inquiryLikeService.getLikeCount(inquiryNum);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("likeCount", likeCount);
+        response.put("userLiked", !userLiked); // 응답에 토글된 상태 포함
+
+        return response;
+    }
+    
+    
+    @GetMapping("/inquiry/likeUsers")
+    @ResponseBody
+    public List<String> getLikeUsers(@RequestParam("inquiryNum") Long inquiryNum) {
+        return inquiryLikeService.getLikeUsers(inquiryNum);
     }
 
     @PostMapping("/Member/inquiry/addComment")
