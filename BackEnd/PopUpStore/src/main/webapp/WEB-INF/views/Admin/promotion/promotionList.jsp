@@ -26,23 +26,7 @@
             color: #fff;
             padding: 5px 10px;
         }
-        footer {
-            background-color: #000;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-            border-top: 1px solid #ddd;
-        }
-        footer .footer-nav {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 10px;
-        }
-        footer .footer-nav a {
-            text-decoration: none;
-            color: #fff;
-        }
+       
         .table-container {
             margin: 20px auto;
             max-width: 800px;
