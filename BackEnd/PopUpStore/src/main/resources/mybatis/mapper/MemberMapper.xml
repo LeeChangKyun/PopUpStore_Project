@@ -11,7 +11,7 @@
 <!-- MyUserDTO를 IMyUserDao에 넣는다.
 (namespace는 이 매퍼가 어떤 인터페이스와 관련된 매퍼인지를 알려준다)-->
 
-<mapper namespace="com.popup.project.member.dto.UserMapper"> 
+<mapper namespace="com.popup.project.member.mapper.UserMapper"> 
 	
 	<insert id="register">
     INSERT INTO USERS

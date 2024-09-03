@@ -1,9 +1,11 @@
-package com.popup.project.member.dto;
+package com.popup.project.member.mapper;
 
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import com.popup.project.member.dto.UserDTO;
 
 @Mapper
 public interface UserMapper {

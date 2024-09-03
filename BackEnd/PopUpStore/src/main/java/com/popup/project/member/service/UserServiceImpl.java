@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.popup.project.member.dto.UserDTO;
-import com.popup.project.member.dto.UserMapper;
 import com.popup.project.member.mail.MailService;
+import com.popup.project.member.mapper.UserMapper;
 
 import jakarta.servlet.http.HttpSession;
 
