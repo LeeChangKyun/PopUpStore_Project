@@ -149,9 +149,8 @@ public class InquiryController {
         
         return "redirect:/Admin/inquiry/inquiryList";
     }
-    
-    
 
+    
     @GetMapping("/Member/inquiry/inquiryView")
     public String boardView(Model model, @RequestParam("inquiry_num") String inquiryNum, HttpSession session) {
         
@@ -167,10 +166,10 @@ public class InquiryController {
         inquirysimplebbsDTO = boardService.getBoardView(inquirysimplebbsDTO);
         inquirysimplebbsDTO.setInquiry_content(inquirysimplebbsDTO.getInquiry_content().replace("\r\n", "<br/>"));
 
-        
         // 좋아요 개수 조회
-        int likeCount = inquiryLikeService.getLikeCount(Long.parseLong(inquiryNum));
+        int likeCount = inquiryLikeService.getLikeCount(inquiryNumLong);
         inquirysimplebbsDTO.setLikeCount(likeCount);
+        
         // 현재 사용자의 좋아요 상태 확인
         boolean userLiked = inquiryLikeService.isLiked(inquiryNumLong, userNick);
         
@@ -180,11 +179,53 @@ public class InquiryController {
         // 댓글 수 계산
         int commentCount = comments.size();
 
+        // 모델에 데이터 추가
         model.addAttribute("inquirysimplebbsDTO", inquirysimplebbsDTO);
         model.addAttribute("comments", comments);
         model.addAttribute("commentCount", commentCount);
+        model.addAttribute("userLiked", userLiked); // 추가된 부분
+
         return "/Member/inquiry/inquiryView";
-    }
+    } 
+    
+    
+    @GetMapping("/Admin/inquiry/inquiryView")
+    public String AdminboardView(Model model, @RequestParam("inquiry_num") String inquiryNum, HttpSession session) {
+        
+        Long inquiryNumLong = Long.parseLong(inquiryNum); 
+        // 사용자 닉네임 가져오기
+        String userNick = (String) session.getAttribute("userNick");
+        
+        InquirySimpleBbsDTO inquirysimplebbsDTO = new InquirySimpleBbsDTO();
+        inquirysimplebbsDTO.setInquiry_num(inquiryNum);
+
+        // 게시물 조회 및 조회수 증가
+        boardService.incrementVisitCount(inquiryNum);
+        inquirysimplebbsDTO = boardService.getBoardView(inquirysimplebbsDTO);
+        inquirysimplebbsDTO.setInquiry_content(inquirysimplebbsDTO.getInquiry_content().replace("\r\n", "<br/>"));
+
+        // 좋아요 개수 조회
+        int likeCount = inquiryLikeService.getLikeCount(inquiryNumLong);
+        inquirysimplebbsDTO.setLikeCount(likeCount);
+        
+        // 현재 사용자의 좋아요 상태 확인
+        boolean userLiked = inquiryLikeService.isLiked(inquiryNumLong, userNick);
+        
+        // 댓글 조회
+        List<inquiryCommentDTO> comments = commentService.getCommentsByInquiryNum(inquiryNum);
+        
+        // 댓글 수 계산
+        int commentCount = comments.size();
+
+        // 모델에 데이터 추가
+        model.addAttribute("inquirysimplebbsDTO", inquirysimplebbsDTO);
+        model.addAttribute("comments", comments);
+        model.addAttribute("commentCount", commentCount);
+        model.addAttribute("userLiked", userLiked); // 추가된 부분
+
+        return "/Admin/inquiry/inquiryView";
+    } 
+    
     
     
     @PostMapping("/inquiry/addLike")
