@@ -19,14 +19,14 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.popup.project.board.promotion.dto.ParameterDTO;
-import com.popup.project.board.promotion.dto.SimpleBbsDTO;
-import com.popup.project.board.promotion.dto.promotionCommentDTO;
-import com.popup.project.board.promotion.service.BoardService;
-import com.popup.project.board.promotion.service.FileDownService;
-import com.popup.project.board.promotion.service.PagingService;
+import com.popup.project.board.promotion.dto.PromotionParameterDTO;
+import com.popup.project.board.promotion.dto.PromotionBoardDTO;
+import com.popup.project.board.promotion.dto.PromotionCommentDTO;
+import com.popup.project.board.promotion.service.PromotionBoardService;
+import com.popup.project.board.promotion.service.PromotionFileDownService;
+import com.popup.project.board.promotion.service.PromotionPagingService;
 import com.popup.project.board.promotion.service.PromotionLikeService;
-import com.popup.project.board.promotion.service.promotionCommentService;
+import com.popup.project.board.promotion.service.PromotionCommentService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -35,33 +35,33 @@ import jakarta.servlet.http.HttpSession;
 public class PromotionController {
 
     @Autowired
-    private BoardService boardService;
+    private PromotionBoardService boardService;
     
     @Autowired
-    private FileDownService fileDownService;
+    private PromotionFileDownService fileDownService;
     
     @Autowired
-    private PagingService pagingService;
+    private PromotionPagingService pagingService;
     
     @Autowired
-    private promotionCommentService promotioncommentService;
+    private PromotionCommentService promotioncommentService;
     
     @Autowired
     private PromotionLikeService promotionLikeService;
 
     @RequestMapping("/promotionList")
-    public String boardList(Model model, HttpServletRequest req, ParameterDTO parameterDTO) {
+    public String boardList(Model model, HttpServletRequest req, PromotionParameterDTO parameterDTO) {
         int totalCount = boardService.getTotalCount(parameterDTO);
         int pageNum = (req.getParameter("pageNum") == null || req.getParameter("pageNum").equals("")) ? 1 : Integer.parseInt(req.getParameter("pageNum"));
 
-        int start = (pageNum - 1) * PagingService.PAGE_SIZE + 1;
-        int end = pageNum * PagingService.PAGE_SIZE;
+        int start = (pageNum - 1) * PromotionPagingService.PAGE_SIZE + 1;
+        int end = pageNum * PromotionPagingService.PAGE_SIZE;
         parameterDTO.setStart(start);
         parameterDTO.setEnd(end);
 
         Map<String, Object> maps = new HashMap<>();
         maps.put("totalCount", totalCount);
-        maps.put("pageSize", PagingService.PAGE_SIZE);
+        maps.put("pageSize", PromotionPagingService.PAGE_SIZE);
         maps.put("pageNum", pageNum);
         model.addAttribute("maps", maps);
 
@@ -92,7 +92,7 @@ public class PromotionController {
             @RequestParam(value = "promotion_sfile", required = false) MultipartFile promotionSfile,
             RedirectAttributes redirectAttributes) {
 
-        SimpleBbsDTO dto = new SimpleBbsDTO();
+        PromotionBoardDTO dto = new PromotionBoardDTO();
         dto.setPromotion_title(promotionTitle);
         dto.setPromotion_content(promotionContent);
         dto.setUser_nick(userNick);  // 닉네임 설정
@@ -120,7 +120,7 @@ public class PromotionController {
         // 사용자 닉네임 가져오기
         String userNick = (String) session.getAttribute("userNick");
         
-        SimpleBbsDTO simplebbsDTO = new SimpleBbsDTO();
+        PromotionBoardDTO simplebbsDTO = new PromotionBoardDTO();
         simplebbsDTO.setPromotion_num(promotionNum);
 
         // 게시물 조회 및 조회수 증가
@@ -135,7 +135,7 @@ public class PromotionController {
         boolean userLiked = promotionLikeService.isLiked(promotionNumLong, userNick);
         
         // 댓글 조회
-        List<promotionCommentDTO> comments = promotioncommentService.getCommentsByPromotionNum(promotionNum);
+        List<PromotionCommentDTO> comments = promotioncommentService.getCommentsByPromotionNum(promotionNum);
 
         // 댓글 수 계산
         int commentCount = comments.size();
@@ -183,7 +183,7 @@ public class PromotionController {
     }
     
     @PostMapping("/promotion/promotionaddComment")
-    public String addComment(promotionCommentDTO protmotioncommentDTO, @RequestParam("promotion_num") String promotionNum, @SessionAttribute("userNick") String userNick) {
+    public String addComment(PromotionCommentDTO protmotioncommentDTO, @RequestParam("promotion_num") String promotionNum, @SessionAttribute("userNick") String userNick) {
     	protmotioncommentDTO.setPromotion_num(promotionNum);
     	protmotioncommentDTO.setUser_nick(userNick);
     	promotioncommentService.promotionaddComment(protmotioncommentDTO);
@@ -193,7 +193,7 @@ public class PromotionController {
     @PostMapping("/promotion/promotiondeleteComment")
     public String promotiondeleteComment(@RequestParam("promotion_comment_id") int commentId, @SessionAttribute("userNick") String userNick, @SessionAttribute("userId") String userId, @RequestParam("promotion_num") String promotionNum) {
         // 댓글 작성자 또는 관리자만 삭제할 수 있도록 확인
-        promotionCommentDTO commentDTO = promotioncommentService.getpromotionCommentById(commentId);
+        PromotionCommentDTO commentDTO = promotioncommentService.getpromotionCommentById(commentId);
         
         if (commentDTO != null && (userNick.equals(commentDTO.getUser_nick()) || "Admin".equals(userId))) {
         	promotioncommentService.promotiondeleteComment(commentId);
@@ -208,7 +208,7 @@ public class PromotionController {
         @RequestParam("promotion_ofile") String promotionOfile,
         @RequestParam("promotion_sfile") String promotionSfile,
         @RequestParam("promotion_num") String promotionNum,
-        SimpleBbsDTO simplebbsDTO) {
+        PromotionBoardDTO simplebbsDTO) {
 
         // 파일 존재 여부 체크
         if (promotionOfile == null || promotionOfile.isEmpty()) {
@@ -222,7 +222,7 @@ public class PromotionController {
     }
 
     @GetMapping("/promotionEdit")
-    public String boardEditGet(Model model, SimpleBbsDTO simplebbsDTO) {
+    public String boardEditGet(Model model, PromotionBoardDTO simplebbsDTO) {
         simplebbsDTO = boardService.getBoardView(simplebbsDTO);
         model.addAttribute("simplebbsDTO", simplebbsDTO);
         return "Member/promotion/promotionEdit";
@@ -239,7 +239,7 @@ public class PromotionController {
     	
     	
 
-        SimpleBbsDTO dto = new SimpleBbsDTO();
+        PromotionBoardDTO dto = new PromotionBoardDTO();
         dto.setPromotion_num(promotionNum);
         dto.setPromotion_title(promotionTitle);
         dto.setPromotion_content(promotionContent);

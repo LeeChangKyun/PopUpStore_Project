@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.popup.project.board.inquiry.service.inquiryCommentMapper">
+    <!-- 댓글 추가 -->
+    <insert id="addComment" parameterType="com.popup.project.board.inquiry.dto.inquiryCommentDTO">
+        INSERT INTO INQUIRY_COMMENT (
+            inquiry_comment_id, 
+            inquiry_num, 
+            user_nick, 
+            inquiry_comment_content, 
+            created_at
+        ) VALUES (
+            inquiry_comment_seq.nextval, 
+            #{inquiry_num}, 
+            #{user_nick, jdbcType=VARCHAR}, 
+            #{inquiry_comment_content, jdbcType=VARCHAR}, 
+            SYSDATE
+        )
+    </insert>
+
+    <!-- 특정 프로모션에 대한 모든 댓글 조회 -->
+    <select id="getCommentsByInquiryNum" resultType="com.popup.project.board.inquiry.dto.inquiryCommentDTO" parameterType="String">
+        SELECT * FROM INQUIRY_COMMENT WHERE inquiry_num = #{inquiry_num}
+    </select>
+    
+    <select id="getinquiryCommentById" resultType="com.popup.project.board.inquiry.dto.inquiryCommentDTO" parameterType="int">
+    SELECT * FROM INQUIRY_COMMENT WHERE inquiry_comment_id = #{commentId}
+	</select>
+    
+    <delete id="inquirydeleteComment" parameterType="int">
+        DELETE FROM INQUIRY_COMMENT WHERE inquiry_comment_id = #{commentId}
+    </delete>
+</mapper>

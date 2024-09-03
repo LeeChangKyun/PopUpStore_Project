@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- PromotionLikeMapper.xml -->
+<mapper namespace="com.popup.project.board.inquiry.service.InquiryLikeMapper">
+
+    <!-- 좋아요 추가 -->
+ <insert id="insertLike">
+    INSERT INTO inquiry_likes (LIKE_ID, inquiry_num, user_nick)
+    VALUES (inquiry_likes_seq.NEXTVAL, #{inquiryNum}, #{userNick})
+</insert>
+
+    <!-- 좋아요 삭제 -->
+    <delete id="deleteLike">
+        DELETE FROM inquiry_likes
+        WHERE inquiry_num = #{inquiryNum} AND user_nick = #{userNick}
+    </delete>
+
+    <!-- 좋아요 여부 확인 -->
+    <select id="checkLike" resultType="int">
+        SELECT COUNT(*)
+        FROM inquiry_likes
+        WHERE inquiry_num = #{inquiryNum} AND user_nick = #{userNick}
+    </select>
+
+    <!-- 좋아요 수 조회 -->
+    <select id="getLikeCount" resultType="int">
+        SELECT COUNT(*)
+        FROM inquiry_likes
+        WHERE inquiry_num = #{inquiryNum}
+    </select>
+	
+	<!-- 좋아요 누른사람 확인 -->
+	<select id="getLikeUsers" resultType="string">
+    SELECT user_nick
+    FROM inquiry_likes
+    WHERE inquiry_num = #{inquiryNum}
+	</select>
+</mapper>
