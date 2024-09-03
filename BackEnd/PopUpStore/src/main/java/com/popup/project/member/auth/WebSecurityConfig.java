@@ -3,6 +3,7 @@ package com.popup.project.member.auth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,8 +16,9 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 
-import com.popup.project.member.service.CustomUserDetailsService;
 import com.popup.project.member.service.CustomOAuth2UserService;
+import com.popup.project.member.service.CustomUserDetailsService;
+import com.popup.project.member.service.UserService;
 
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,10 +33,14 @@ public class WebSecurityConfig {
     private CustomUserDetailsService customUserDetailsService;
 
     @Autowired
-    public MyAuthFailureHandler myAuthFailureHandler;
-
-    @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
+    
+    @Autowired
+    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    
+    @Autowired
+    @Lazy
+    private UserService userService;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -53,6 +59,10 @@ public class WebSecurityConfig {
     public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
         return (request, response, authentication) -> {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+            // 로그인 성공 시 실패 횟수 초기화
+            userService.resetFailedAttempts(userDetails.getUsername());
+
             if (userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
                 response.sendRedirect("/Admin/Home?adminLogin=true");
             } else {
@@ -60,7 +70,7 @@ public class WebSecurityConfig {
             }
         };
     }
-    
+
     @Bean
     public AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler() {
         return (request, response, authentication) -> {
@@ -74,7 +84,6 @@ public class WebSecurityConfig {
             }
         };
     }
-    
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -109,8 +118,8 @@ public class WebSecurityConfig {
                 .passwordParameter("userPwd")
                 .loginPage("/Guest/auth/Login")
                 .loginProcessingUrl("/Login")
-                .failureUrl("/Guest/auth/Login?error=true")
-                .successHandler(customAuthenticationSuccessHandler())
+                .failureHandler(customAuthenticationFailureHandler)
+                .successHandler(customAuthenticationSuccessHandler()) // 여기서 customAuthenticationSuccessHandler 사용
                 .permitAll()
             )
             .logout(logout -> logout
@@ -133,7 +142,7 @@ public class WebSecurityConfig {
                 .defaultSuccessUrl("/SocialForm", true)
                 .failureUrl("/Guest/auth/Login?error=true")
                 .userInfoEndpoint(userInfo -> userInfo
-                    .userService(customOAuth2UserService)  // Custom OAuth2UserService 설정
+                    .userService(customOAuth2UserService)
                 )
             );
 

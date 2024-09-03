@@ -53,4 +53,8 @@ public class UserDTO {
     
     private String socialEmail;     // 추가
 	
+    private int failedAttempts;      // 로그인 실패 시도 횟수
+    
+    private boolean accountLocked;   // 계정 잠김 여부
+    
 }

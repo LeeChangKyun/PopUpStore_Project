@@ -18,14 +18,14 @@ import jakarta.servlet.http.HttpSession;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
     
     @Autowired
-    BCryptPasswordEncoder pwEncoder;
+    private BCryptPasswordEncoder pwEncoder;
     
     @Autowired
     private MailService mailService;
-
+    
     @Override
     public UserDTO getUserByUsername(String username) {
         return userMapper.getUserByUsername(username);
@@ -66,6 +66,7 @@ public class UserServiceImpl implements UserService {
         return count > 0; // 아이디와 이메일이 일치하는 경우 true 반환
     }
 
+    @Transactional
     public void handlePasswordReset(String email, HttpSession session) {
         // 트랜잭션 내에서 비밀번호 업데이트
         String tempPassword = generateTempPassword();
@@ -151,4 +152,59 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("소셜 로그인 사용자 등록 중 오류 발생");
         }
     }
+    
+    // 로그인 실패 시도 증가
+    @Override
+    @Transactional
+    public void increaseFailedAttempts(UserDTO user) {
+        if ("ROLE_ADMIN".equals(userMapper.getUserAuthority(user.getUserId()))) {
+            return; // Admin은 실패 횟수 증가하지 않음
+        }
+        
+        // 실패 횟수를 강제로 다시 가져옴
+        int currentFailedAttempts = userMapper.getFailedAttempts(user.getUserId());
+        System.out.println("Current failed attempts for user " + user.getUserId() + ": " + currentFailedAttempts);
+        
+        // 새로운 실패 횟수 계산
+        int newFailAttempts = currentFailedAttempts + 1;
+        System.out.println("Failed attempts for user " + user.getUserId() + ": " + newFailAttempts);
+        
+        // 실패 횟수 업데이트
+        userMapper.updateFailedAttempts(newFailAttempts, user.getUserId());
+        
+        // UserDTO 객체에 실패 횟수 반영
+        user.setFailedAttempts(newFailAttempts);
+        
+        // 5회 이상 실패 시 계정 잠금
+        if (newFailAttempts >= 5) {
+            lockAccount(user.getUserId());
+        }
+    }
+
+    @Override
+    @Transactional
+    public void resetFailedAttempts(String userId) {
+        System.out.println("Resetting failed attempts for user " + userId);
+        userMapper.updateFailedAttempts(0, userId);
+    }
+
+    // 계정 잠금
+    @Override
+    @Transactional
+    public void lockAccount(String userId) {
+        userMapper.lockAccount(userId);
+    }
+
+    // 계정 잠금 해제
+    @Override
+    @Transactional
+    public void unlockAccount(String userId) {
+        userMapper.unlockAccount(userId);
+    }
+    
+    @Override
+    public String getUserAuthority(@Param("userId") String userId) {
+        return userMapper.getUserAuthority(userId);
+    }
+    
 }

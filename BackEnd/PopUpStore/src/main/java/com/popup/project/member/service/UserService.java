@@ -30,4 +30,15 @@ public interface UserService {
 
     // 소셜 로그인 사용자 등록 메서드 추가
     void registerSocialUser(UserDTO user);
+    
+    public void increaseFailedAttempts(UserDTO user);
+    
+    public void resetFailedAttempts(String userId);
+    
+    public void lockAccount(String userId);
+    
+    public void unlockAccount(String userId);
+    
+    String getUserAuthority(@Param("userId") String userId);
+    
 }
