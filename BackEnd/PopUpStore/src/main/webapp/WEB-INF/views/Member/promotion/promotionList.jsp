@@ -15,48 +15,8 @@
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css">
     <style>
        
-        .search-bar {
-            /* 검색 바를 수직으로 중앙에 배치하고, 상하 패딩 및 배경색 설정 */
-            display: flex;s
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            background-color: #fff;
-            border-bottom: 1px solid #ddd; /* 아래 테두리에 얇은 선 추가 */
-        }
-
-        .search-bar h2 {
-            /* 검색 바 안의 제목 글자색을 흰색으로 설정 */
-            color: white;
-        }
-
-        .search-bar select {
-            /* 카테고리 선택창의 높이 및 너비 설정, 오른쪽 여백 추가 */
-            height: 38px;
-            width: 120px;
-            margin-right: 10px;
-        }
-
-        .search-bar input[type="text"] {
-            /* 검색 입력창의 높이와 너비를 설정하고, 오른쪽 여백 추가 */
-            height: 38px;
-            margin-right: 10px;
-            width: 250px;
-        }
-
-        .search-bar button {
-            /* 버튼의 여백을 설정하여 텍스트와 버튼의 경계를 좁게 조정 */
-            white-space: nowrap;
-            padding: 0 15px;
-        }
-
-        .search-bar form {
-            /* 검색 폼을 수평으로 정렬하고, 중앙에 위치시키기 위해 align-items 사용 */
-            display: flex;
-            align-items: center;
-        }
-
+       
+		
         
        
 
@@ -138,14 +98,7 @@
 		    border-color: #dee2e6;
 		    color: #6c757d;
 		}
-		
-		/* 검색 폼 스타일 */
-		.search-form {
-		    /* 검색 폼의 최대 너비를 설정하고, 가운데 정렬 */
-		    max-width: 500px;
-		    margin: 0 auto;
-		}
-		
+
 		.input-group {
 		    /* Bootstrap 기본 border-radius 설정 */
 		    border-radius: 0.375rem;
@@ -227,7 +180,7 @@
 				                (((maps.pageNum-1) * maps.pageSize)	+ loop.index)}" />
 				            	${vNum}
 				            </td>
-				            <td align="left"> 
+				            <td align="center"> 
 				                <a href="/promotionView?promotion_num=${row.promotion_num}&vNum=${vNum}">${ row.promotion_title }</a> 
 				            </td> 
 				            <td>${ row.user_nick }</td> 

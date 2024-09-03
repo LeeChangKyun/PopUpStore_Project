@@ -431,7 +431,23 @@
 		        </div>
 		    </form>
 		</div>
-		</div>
+          <!-- 버튼 그룹 -->
+        <div class="action-buttons">
+            <!-- 수정 및 삭제 버튼 조건부 표시 -->
+            <c:choose>
+                <c:when test="${simplebbsDTO.user_nick == sessionScope.userNick or sessionScope.userId == 'Admin'}">
+                    <div class="btn-group">
+                        <button type="button" onclick="location.href='/promotionEdit?&promotion_num=${simplebbsDTO.promotion_num}';" class="btn btn-back">수정</button>
+                        <button type="button" onclick="promotiondeletePost(${simplebbsDTO.promotion_num});" class="btn btn-back">삭제</button>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <!-- 일반 사용자 또는 관리자 외에는 수정 및 삭제 버튼을 숨김 -->
+                </c:otherwise>
+            </c:choose>
+            <button type="button" onclick="location.href='/promotionList';" class="btn btn-back">목록으로 돌아가기</button>
+        </div>
+	</div>
 		
 <!-- 		댓글 토글 -->
 			<script>
@@ -451,23 +467,8 @@
 			</script>
 		
 		
-          <!-- 버튼 그룹 -->
-        <div class="action-buttons">
-            <!-- 수정 및 삭제 버튼 조건부 표시 -->
-            <c:choose>
-                <c:when test="${simplebbsDTO.user_nick == sessionScope.userNick or sessionScope.userId == 'Admin'}">
-                    <div class="btn-group">
-                        <button type="button" onclick="location.href='/promotionEdit?&promotion_num=${simplebbsDTO.promotion_num}';" class="btn btn-back">수정</button>
-                        <button type="button" onclick="promotiondeletePost(${simplebbsDTO.promotion_num});" class="btn btn-back">삭제</button>
-                    </div>
-                </c:when>
-                <c:otherwise>
-                    <!-- 일반 사용자 또는 관리자 외에는 수정 및 삭제 버튼을 숨김 -->
-                </c:otherwise>
-            </c:choose>
-            <button type="button" onclick="location.href='/promotionList';" class="btn btn-back">목록으로 돌아가기</button>
-        </div>
     </div>
+    
 
     <!-- 푸터 시작 -->
     <%@ include file="/WEB-INF/views/Common/footer.jsp" %>

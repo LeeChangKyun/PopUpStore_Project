@@ -392,7 +392,7 @@
             <c:choose>
                 <c:when test="${simplebbsDTO.user_nick == sessionScope.userNick or sessionScope.userId == 'Admin'}">
                     <div class="btn-group">
-						<button type="button" onclick="location.href='/promotionEdit?&promotion_num=${simplebbsDTO.promotion_num}';" class="btn btn-back">수정</button>
+						<button type="button" onclick="location.href='/Admin/promotionEdit?&promotion_num=${simplebbsDTO.promotion_num}';" class="btn btn-back">수정</button>
                         <button type="button" onclick="promotiondeletePost(${simplebbsDTO.promotion_num});" class="btn btn-back">삭제</button>
                     </div>
                 </c:when>
