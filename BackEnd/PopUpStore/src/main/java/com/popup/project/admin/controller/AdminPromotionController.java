@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -24,9 +25,11 @@ import com.popup.project.board.promotion.dto.promotionCommentDTO;
 import com.popup.project.board.promotion.service.BoardService;
 import com.popup.project.board.promotion.service.FileDownService;
 import com.popup.project.board.promotion.service.PagingService;
+import com.popup.project.board.promotion.service.PromotionLikeService;
 import com.popup.project.board.promotion.service.promotionCommentService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/Admin")
@@ -43,6 +46,9 @@ public class AdminPromotionController {
     
     @Autowired
     private promotionCommentService promotioncommentService;
+    
+    @Autowired
+    private PromotionLikeService promotionLikeService;
 
     @RequestMapping("/promotionList")
     public String boardList(Model model, HttpServletRequest req, ParameterDTO parameterDTO) {
@@ -109,7 +115,12 @@ public class AdminPromotionController {
     }
 
     @GetMapping("/promotionView")
-    public String boardView(Model model, @RequestParam("promotion_num") String promotionNum) {
+    public String boardView(Model model, @RequestParam("promotion_num") String promotionNum, HttpSession session) {
+        // PromotionNum을 Long으로 변환
+        Long promotionNumLong = Long.parseLong(promotionNum); 
+        // 사용자 닉네임 가져오기
+        String userNick = (String) session.getAttribute("userNick");
+        
         SimpleBbsDTO simplebbsDTO = new SimpleBbsDTO();
         simplebbsDTO.setPromotion_num(promotionNum);
 
@@ -118,6 +129,12 @@ public class AdminPromotionController {
         simplebbsDTO = boardService.getBoardView(simplebbsDTO);
         simplebbsDTO.setPromotion_content(simplebbsDTO.getPromotion_content().replace("\r\n", "<br/>"));
 
+	    // 좋아요 개수 조회
+        int likeCount = promotionLikeService.getLikeCount(Long.parseLong(promotionNum));
+        simplebbsDTO.setLikeCount(likeCount);
+        // 현재 사용자의 좋아요 상태 확인
+        boolean userLiked = promotionLikeService.isLiked(promotionNumLong, userNick);
+        
         // 댓글 조회
         List<promotionCommentDTO> comments = promotioncommentService.getCommentsByPromotionNum(promotionNum);
 
@@ -127,7 +144,43 @@ public class AdminPromotionController {
         model.addAttribute("simplebbsDTO", simplebbsDTO);
         model.addAttribute("comments", comments);
         model.addAttribute("commentCount", commentCount);
+        model.addAttribute("userLiked", userLiked);
         return "Admin/promotion/promotionView";
+    }
+    
+    @PostMapping("/promotion/addLike")
+    public String addLike(@RequestParam("promotion_num") Long promotionNum,
+                          @SessionAttribute("userNick") String userNick) {
+        promotionLikeService.addLike(promotionNum, userNick);
+        return "redirect:/promotionView?promotion_num=" + promotionNum;
+    }
+
+    @PostMapping("/promotion/removeLike")
+    public String removeLike(@RequestParam("promotion_num") Long promotionNum,
+                             @SessionAttribute("userNick") String userNick) {
+        promotionLikeService.removeLike(promotionNum, userNick);
+        return "redirect:/promotionView?promotion_num=" + promotionNum;
+    }
+    
+    @PostMapping("/promotion/toggleLike")
+    @ResponseBody
+    public Map<String, Object> toggleLike(@RequestParam("promotionNum") Long promotionNum,
+                                           @RequestParam("userNick") String userNick) {
+        boolean userLiked = promotionLikeService.isLiked(promotionNum, userNick);
+
+        if (userLiked) {
+            promotionLikeService.removeLike(promotionNum, userNick);
+        } else {
+            promotionLikeService.addLike(promotionNum, userNick);
+        }
+
+        int likeCount = promotionLikeService.getLikeCount(promotionNum);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("likeCount", likeCount);
+        response.put("userLiked", !userLiked); // 응답에 토글된 상태 포함
+
+        return response;
     }
 
     @PostMapping("/promotion/promotionaddComment")
