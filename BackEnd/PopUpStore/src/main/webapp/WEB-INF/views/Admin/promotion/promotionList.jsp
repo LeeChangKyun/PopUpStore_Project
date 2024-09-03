@@ -219,7 +219,7 @@
 				<c:choose>
 				    <c:when test="${ empty lists }"> 
 				        <tr>
-				            <td colspan="5" align="center">
+				            <td colspan="6" align="center">
 				                등록된 게시물이 없습니다^^*
 				            </td>
 				        </tr>

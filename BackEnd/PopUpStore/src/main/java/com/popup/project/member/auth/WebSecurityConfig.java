@@ -90,7 +90,7 @@ public class WebSecurityConfig {
                 .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                 .requestMatchers("/Admin/**").hasRole("ADMIN")
                 .requestMatchers("/Member/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/promotionList", "/promotionWrite", "/promotionView").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/promotionList", "/promotionWrite", "/promotionView", "/promotionEdit").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/inquiryWrite", "/promotionWrite").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/promotionList", "/promotionWrite", "/promotionView").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/", "/register_form", "/register", "/IdCheck", "/NickCheck", "/EmailCheck", "/PhoneCheck").permitAll()
