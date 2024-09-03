@@ -2,57 +2,40 @@ package com.popup.project.board.review.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.popup.project.board.review.model.ReviewBoard;
-import com.popup.project.board.review.model.ReviewBoardMapper;
-import com.popup.project.board.review.model.ReviewLikes;
 import com.popup.project.board.review.model.ReviewLikesMapper;
-import com.popup.project.board.review.model.ReviewUser;
-import com.popup.project.board.review.model.ReviewUserMapper;
 
 @Service
 public class ReviewLikesService {
 
     private final ReviewLikesMapper reviewLikesMapper;
-    private final ReviewBoardMapper reviewBoardMapper;
-    private final ReviewUserMapper reviewUserMapper;
 
     @Autowired
-    public ReviewLikesService(ReviewLikesMapper reviewLikesMapper, ReviewBoardMapper reviewBoardMapper, ReviewUserMapper reviewUserMapper) {
+    public ReviewLikesService(ReviewLikesMapper reviewLikesMapper) {
         this.reviewLikesMapper = reviewLikesMapper;
-        this.reviewBoardMapper = reviewBoardMapper;
-        this.reviewUserMapper = reviewUserMapper;
     }
 
-    @Transactional
-    public boolean toggleLike(int reviewNum, String userNick) {
-        ReviewBoard review = reviewBoardMapper.getPostById(reviewNum);
-        if (review == null) {
-            throw new IllegalArgumentException("Invalid review ID");
+    public void addLike(int reviewNum, String userNick) {
+        if (!isLiked(reviewNum, userNick)) {
+            reviewLikesMapper.insertLike(reviewNum, userNick);
         }
+    }
 
-        ReviewUser user = reviewUserMapper.findByUserNick(userNick);
-        if (user == null) {
-            throw new IllegalArgumentException("Invalid user nickname");
-        }
-
-        boolean exists = reviewLikesMapper.existsByReviewAndUser(reviewNum, userNick);
-
-        if (exists) {
+    public void deleteLike(int reviewNum, String userNick) {
+        if (isLiked(reviewNum, userNick)) {
             reviewLikesMapper.deleteByReviewAndUser(reviewNum, userNick);
-            review.decrementLikeCount();  
-        } else {
-            ReviewLikes like = new ReviewLikes();
-            like.setReviewNum(reviewNum);
-            like.setUserNick(userNick);
-            reviewLikesMapper.insertLike(like);
-            review.incrementLikeCount(); 
+            int likeCount = reviewLikesMapper.countByReviewNum(reviewNum);
+            if (likeCount < 0) {
+                likeCount = 0; // 좋아요 수가 음수로 내려가지 않도록 설정
+            }
         }
-
-        reviewBoardMapper.updatePost(review);
-
-        return !exists; 
     }
 
+    public int getLikeCount(int reviewNum) {
+        return reviewLikesMapper.countByReviewNum(reviewNum);
+    }
+
+    public boolean isLiked(int reviewNum, String userNick) {
+        return reviewLikesMapper.existsByReviewAndUser(reviewNum, userNick);
+    }
 }
