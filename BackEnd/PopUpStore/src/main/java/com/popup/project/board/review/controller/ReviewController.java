@@ -37,8 +37,6 @@ public class ReviewController {
     private final ReviewCommentService reviewCommentService;
     private final ReviewLikesService reviewLikesService;
     private final ReviewUploadService reviewUploadService;
-    private final ReviewUserMapper reviewUserMapper;
-    private final ReviewBoardMapper reviewBoardMapper;
 
     @Autowired
     public ReviewController(
@@ -52,24 +50,27 @@ public class ReviewController {
         this.reviewCommentService = reviewCommentService;
         this.reviewLikesService = reviewLikesService;
         this.reviewUploadService = reviewUploadService;
-        this.reviewUserMapper = reviewUserMapper;
-        this.reviewBoardMapper = reviewBoardMapper;
     }
 
+    // 리스트 페이지
     @GetMapping("/{role}/review/reviewList")
     public String reviewList(
+    		// @PathVariable("role") : 역할(role)에 따라 경로 설정
             @PathVariable("role") String role,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "searchField", required = false) String searchField,
             @RequestParam(value = "searchWord", required = false) String searchWord,
             Model model) {
         
+    	// 페이지 당 게시글 수
         int pageSize = 10;
         int start = (page - 1) * pageSize + 1;
         int end = page * pageSize;
 
         List<ReviewBoard> boardList;
         int totalCount;
+        
+        // 검색 여부에 따라 리스트 조회
         if (searchField != null && !searchField.trim().isEmpty() && searchWord != null && !searchWord.trim().isEmpty()) {
             boardList = reviewBoardService.searchPostsByPage(searchField, searchWord, start, end);
             totalCount = reviewBoardService.getSearchPostCount(searchField, searchWord);
@@ -78,15 +79,17 @@ public class ReviewController {
             totalCount = reviewBoardService.getPostCount();
         }
         
-        // 게시글 목록에서 제목 옆에 댓글 갯수를 표시하기 위해 추가함
+        // 각 게시글에 댓글 수 추가(제목 옆에)
         boardList.forEach(post -> {
             int commentCount = reviewCommentService.getCommentCountByReviewNum(post.getReviewNum());
-            post.setCommentCount(commentCount); // ReviewBoard에 댓글 수 저장
+            // 댓글 수 설정
+            post.setCommentCount(commentCount);
         });
 
-
+        // 페이지네이션을 위한 HTML 코드 생성
         String pagingImg = ReviewBoardPage.pagingStr(totalCount, pageSize, 10, page, "/" + role + "/review/reviewList");
 
+        // 모델에 데이터 추가
         model.addAttribute("boardList", boardList);
         model.addAttribute("page", page);
         model.addAttribute("totalCount", totalCount);
@@ -95,9 +98,11 @@ public class ReviewController {
         model.addAttribute("searchField", searchField);
         model.addAttribute("searchWord", searchWord);
         
+        // 역할(role)에 맞는 리스트 페이지로 이동
         return role + "/review/reviewList";
     }
 
+    // 상세 페이지
     @GetMapping("/{role}/review/reviewView")
     public String reviewViewPost(
             @PathVariable("role") String role, 
@@ -105,143 +110,115 @@ public class ReviewController {
             Model model,
             HttpSession session) {
 
+    	// 게시글 가져옴
         ReviewBoard post = reviewBoardService.getPostById(reviewNum);
+        // 댓글 목록 가져옴
         List<ReviewComment> comments = reviewCommentService.getCommentsByReviewNum(reviewNum);
         
-        // 세션에서 사용자 정보를 가져옵니다.
+        // 세션에서 사용자 정보 가져옴
         String userNick = (String) session.getAttribute("userNick");
 
-        // 비회원 사용자 처리
+        // 사용자가 좋아요를 눌렀는지 확인
         boolean isLiked = false;
         if (userNick != null) {
-            // 해당 사용자가 이 게시물에 좋아요를 눌렀는지 확인
             isLiked = reviewBoardService.isUserLikedPost(reviewNum, userNick);
         }
 
-        // 댓글의 날짜 형식을 설정합니다.
+        // 댓글의 날짜 형식화
         comments.forEach(comment -> {
             String formattedDate = comment.getFormattedCommentDate();
             comment.setFormattedCommentDate(formattedDate);
         });
 
-        // 모델에 데이터를 추가합니다.
+        // 모델에 데이터 추가
         model.addAttribute("dto", post);
         model.addAttribute("comments", comments);
-        model.addAttribute("isLiked", isLiked); // 사용자가 좋아요를 눌렀는지 여부를 추가
+        model.addAttribute("isLiked", isLiked);
 
+        // 역할(role)에 맞는 상세 페이지로 이동
         return role + "/review/reviewView";
     }
     
-    @GetMapping("/Member/review/reviewWrite")
-    public String MemberReviewWriteGet() {
-        return "Member/review/reviewWrite";
-    }
-    
-    @GetMapping("/Admin/review/reviewWrite")
-    public String AdminReviewWriteGet() {
-        return "Admin/review/reviewWrite";
+    // 작성 페이지
+    @GetMapping("/{role}/review/reviewWrite")
+    public String reviewWriteGet(@PathVariable("role") String role) {
+        return role + "/review/reviewWrite";
     }
 
-    @PostMapping("/Member/review/reviewWrite")
-    public String MemberReviewWritePost(
+    // 작성 처리
+    @PostMapping("/{role}/review/reviewWrite")
+    public String reviewWritePost(
+        @PathVariable("role") String role,
         @RequestParam("reviewTitle") String reviewTitle,
         @RequestParam("reviewContent") String reviewContent,
         @RequestParam(value = "reviewOfile", required = false) List<MultipartFile> reviewOfile,
         HttpServletRequest request) {
 
         String userNick = (String) request.getSession().getAttribute("userNick");
+
+        // 리뷰 객체 생성
+        ReviewBoard review = new ReviewBoard();
+        review.setReviewTitle(reviewTitle);
+        review.setReviewContent(reviewContent);
+        review.setUserNick(userNick);
+
+        // 파일 업로드 처리
+        if (reviewOfile != null && !reviewOfile.isEmpty()) {
+            try {
+                List<String> savedFileNames = reviewUploadService.saveFiles(reviewOfile);
+                review.setReviewOfile(String.join(",", savedFileNames));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "error";
+            }
+        } else {
+        	// 업로드 파일이 없을 경우 null로 설정
+        	review.setReviewOfile(null);
+        }
+
+        // 게시물 저장 처리
+        try {
+            reviewBoardService.writePost(review);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "error";
+        }
+
+        // 역할(role)에 맞는 리스트 페이지로 리다이렉트
+        return "redirect:/" + role + "/review/reviewList";
+    }
+
+    // 수정 페이지
+    @GetMapping("/{role}/review/reviewEdit")
+    public String reviewEditGet(
+        @PathVariable("role") String role,
+        @RequestParam("reviewNum") int reviewNum, 
+        Model model) {
+
+        // 게시글 가져오기
+        ReviewBoard review = reviewBoardService.getPostById(reviewNum);
+        if (review == null) {
+            // 역할(role)에 맞는 리스트 페이지로 리다이렉트
+            return "redirect:/" + role + "/review/reviewList";
+        }
+
+        // 모델에 데이터 추가
+        model.addAttribute("dto", review);
         
-        ReviewBoard review = new ReviewBoard();
-        review.setReviewTitle(reviewTitle);
-        review.setReviewContent(reviewContent);
-        review.setUserNick(userNick);
-
-        if (reviewOfile != null && !reviewOfile.isEmpty()) {
-            try {
-                List<String> savedFileNames = reviewUploadService.saveFiles(reviewOfile);
-                review.setReviewOfile(String.join(",", savedFileNames));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "error";
-            }
-        } else {
-            review.setReviewOfile(null); // 업로드 파일이 없을 경우 null로 설정
-        }
-
-        try {
-            reviewBoardService.writePost(review);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "error";
-        }
-
-        return "redirect:/Member/review/reviewList";
-    }
-    
-    @PostMapping("/Admin/review/reviewWrite")
-    public String AdminReviewWritePost(
-        @RequestParam("reviewTitle") String reviewTitle,
-        @RequestParam("reviewContent") String reviewContent,
-        @RequestParam(value = "reviewOfile", required = false) List<MultipartFile> reviewOfile,
-        HttpServletRequest request) {
-
-        String userNick = (String) request.getSession().getAttribute("userNick");
-
-        ReviewBoard review = new ReviewBoard();
-        review.setReviewTitle(reviewTitle);
-        review.setReviewContent(reviewContent);
-        review.setUserNick(userNick);
-
-        if (reviewOfile != null && !reviewOfile.isEmpty()) {
-            try {
-                List<String> savedFileNames = reviewUploadService.saveFiles(reviewOfile);
-                review.setReviewOfile(String.join(",", savedFileNames));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "error";
-            }
-        } else {
-            review.setReviewOfile(null); // 업로드 파일이 없을 경우 null로 설정
-        }
-
-        try {
-            reviewBoardService.writePost(review);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "error";
-        }
-
-        return "redirect:/Admin/review/reviewList";
+        // 역할(role)에 맞는 수정 페이지로 이동
+        return role + "/review/reviewEdit";
     }
 
-    @GetMapping("/Member/review/reviewEdit")
-    public String MemberReviewEditGet(@RequestParam("reviewNum") int reviewNum, Model model) {
-        ReviewBoard review = reviewBoardService.getPostById(reviewNum);
-        if (review == null) {
-            return "redirect:/Member/review/reviewList";
-        }
-        model.addAttribute("dto", review);
-        return "Member/review/reviewEdit";
-    }
-    
-    @GetMapping("/Admin/review/reviewEdit")
-    public String AdminReviewEditGet(@RequestParam("reviewNum") int reviewNum, Model model) {
-        ReviewBoard review = reviewBoardService.getPostById(reviewNum);
-        if (review == null) {
-            return "redirect:/Admin/review/reviewList";
-        }
-        model.addAttribute("dto", review);
-        return "Admin/review/reviewEdit";
-    }
-
-    @PostMapping("/Member/review/reviewEdit")
-    public String MemberReviewEditPost(
+    // 수정 처리
+    @PostMapping("/{role}/review/reviewEdit")
+    public String reviewEditPost(
+        @PathVariable("role") String role,
         @RequestParam("reviewNum") int reviewNum,
         @RequestParam("reviewTitle") String reviewTitle,
         @RequestParam("reviewContent") String reviewContent,
         @RequestParam(value = "reviewOfile", required = false) List<MultipartFile> reviewOfile,
         @RequestParam("existingFile") String existingFile,
-        @RequestParam(value = "deleteFile", required = false) boolean deleteFile,
+        @RequestParam(value = "deleteFile", required = false, defaultValue = "false") boolean deleteFile,
         HttpServletRequest request,
         Model model) {
 
@@ -250,76 +227,22 @@ public class ReviewController {
         // 작성자 검증
         ReviewBoard review = reviewBoardService.getPostById(reviewNum);
         if (review == null || (!review.getUserNick().equals(userNick) && !userNick.equals("관리자"))) {
-            return "redirect:/Member/review/reviewList";
+            return "redirect:/" + role + "/review/reviewList";
         }
 
+        // 리뷰 수정 내용 설정
         review.setReviewTitle(reviewTitle);
         review.setReviewContent(reviewContent);
+        review.setExistingFile(existingFile);
 
-        // 파일 삭제 처리
-        if (deleteFile) {
-            reviewUploadService.deleteFile(existingFile); // 실제 파일 삭제
-            review.setReviewOfile(null); // DB에서도 파일 정보를 null로 업데이트
-        } else if (reviewOfile != null && !reviewOfile.isEmpty()) {
-            try {
-                List<String> savedFileNames = reviewUploadService.saveFiles(reviewOfile);
-                review.setReviewOfile(String.join(",", savedFileNames));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "error";
-            }
-        } else {
-            review.setReviewOfile(existingFile); // 기존 파일 유지
-        }
+        // reviewOfile을 전달하여 게시물 수정
+        reviewBoardService.editPost(review, deleteFile, reviewOfile);
 
-        reviewBoardService.editPost(review);
-
-        return "redirect:/Member/review/reviewView?reviewNum=" + reviewNum;
-    }
-    
-    @PostMapping("/Admin/review/reviewEdit")
-    public String AdminReviewEditPost(
-        @RequestParam("reviewNum") int reviewNum,
-        @RequestParam("reviewTitle") String reviewTitle,
-        @RequestParam("reviewContent") String reviewContent,
-        @RequestParam(value = "reviewOfile", required = false) List<MultipartFile> reviewOfile,
-        @RequestParam("existingFile") String existingFile,
-        @RequestParam(value = "deleteFile", required = false) boolean deleteFile,
-        HttpServletRequest request,
-        Model model) {
-
-        String userNick = (String) request.getSession().getAttribute("userNick");
-
-        // 작성자 검증
-        ReviewBoard review = reviewBoardService.getPostById(reviewNum);
-        if (review == null || (!review.getUserNick().equals(userNick) && !userNick.equals("관리자"))) {
-            return "redirect:/Admin/review/reviewList";
-        }
-
-        review.setReviewTitle(reviewTitle);
-        review.setReviewContent(reviewContent);
-
-        // 파일 삭제 처리
-        if (deleteFile) {
-            reviewUploadService.deleteFile(existingFile); // 실제 파일 삭제
-            review.setReviewOfile(null); // DB에서도 파일 정보를 null로 업데이트
-        } else if (reviewOfile != null && !reviewOfile.isEmpty()) {
-            try {
-                List<String> savedFileNames = reviewUploadService.saveFiles(reviewOfile);
-                review.setReviewOfile(String.join(",", savedFileNames));
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "error";
-            }
-        } else {
-            review.setReviewOfile(existingFile); // 기존 파일 유지
-        }
-
-        reviewBoardService.editPost(review);  // 수정된 파일 정보로 DB 업데이트
-
-        return "redirect:/Admin/review/reviewView?reviewNum=" + reviewNum;
+        // 역할(role)에 맞는 상세 페이지로 리다이렉트
+        return "redirect:/" + role + "/review/reviewView?reviewNum=" + reviewNum;
     }
 
+    // 삭제 처리
     @PostMapping("/reviewDelete")
     @ResponseBody
     public String reviewDeletePost(@RequestParam("reviewNum") int reviewNum, HttpSession session) {
@@ -332,15 +255,18 @@ public class ReviewController {
         }
 
         reviewBoardService.deletePost(reviewNum);
+        
         return "success";
     }
     
+    // 댓글 목록 조회
     @GetMapping("/getReviewComments")
     @ResponseBody
     public List<ReviewComment> getReviewComments(@RequestParam("reviewNum") int reviewNum) {
     	return reviewCommentService.getCommentsByReviewNum(reviewNum);
     }
 
+    // 댓글 추가
     @PostMapping("/{role}/reviewCommentAdd")
     public String reviewCommentAdd(
             @PathVariable("role") String role,
@@ -360,23 +286,25 @@ public class ReviewController {
         reviewCommentService.reviewCommentAdd(comment);
 
         redirectAttributes.addAttribute("reviewNum", reviewNum);
+        
         return "redirect:/" + role + "/review/reviewView";
     }
 
-    @PostMapping("/Member/reviewCommentDelete")
+    // 댓글 삭제
+    @PostMapping("/{role}/reviewCommentDelete")
     @ResponseBody
-    public String MemberReviewCommentDelete(@RequestParam("commentId") int commentId) {
+    public String reviewCommentDelete(
+        @PathVariable("role") String role, 
+        @RequestParam("commentId") int commentId) {
+        
+        // 댓글 삭제 처리
         reviewCommentService.reviewCommentDelete(commentId);
-        return "success";
-    }
-    
-    @PostMapping("/Admin/reviewCommentDelete")
-    @ResponseBody
-    public String AdminReviewCommentDelete(@RequestParam("commentId") int commentId) {
-        reviewCommentService.reviewCommentDelete(commentId);
+        
+        // 처리 완료 후 성공 메시지 반환
         return "success";
     }
 
+    // 좋아요 추가
     @PostMapping("/review/addLike")
     public String addLike(@RequestParam("reviewNum") int reviewNum,
                           @SessionAttribute("userNick") String userNick) {
@@ -384,6 +312,7 @@ public class ReviewController {
         return "redirect:/reviewView?reviewNum=" + reviewNum; 
     }
 
+    // 좋아요 삭제
     @PostMapping("/review/deleteLike")
     public String deleteLike(@RequestParam("reviewNum") int reviewNum,
                              @SessionAttribute("userNick") String userNick) {
@@ -391,6 +320,7 @@ public class ReviewController {
         return "redirect:/reviewView?reviewNum=" + reviewNum; 
     }
     
+    // 좋아요 토글 (추가/삭제)
     @PostMapping("/review/toggleLike")
     @ResponseBody
     public Map<String, Object> toggleLike(@RequestParam("reviewNum") int reviewNum,
@@ -411,5 +341,4 @@ public class ReviewController {
 
         return response;
     }
-
 }

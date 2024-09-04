@@ -5,15 +5,27 @@
 
 <mapper namespace="com.popup.project.board.review.model.ReviewUserMapper">
     
+    <!-- ReviewUser 객체와 데이터베이스 테이블 간의 매핑을 정의 -->
+    <!-- 현재 리뷰 게시판은 userNick만 사용중...
+    	 나중에 기능 추가시 사용할 수 있으니 작성은 해뒀음 -->
     <resultMap id="reviewUserMap" type="com.popup.project.board.review.model.ReviewUser">
         <result property="userNick" column="user_nick" />
-        <result property="userId" column="user_id" />
+   <!-- <result property="userId" column="user_id" />
         <result property="userName" column="user_name" />
         <result property="userPwd" column="user_pwd" />
+        <result property="userPhone" column="user_phone" />         
+        <result property="userEmail" column="user_email" />        
+        <result property="userZipcode" column="user_zipcode" />    
         <result property="userAddress" column="user_address" />
         <result property="userCreateDate" column="user_create_date" />
+        <result property="authority" column="authority" />          
+        <result property="enabled" column="enabled" />              
+        <result property="socialId" column="social_id" />           
+        <result property="socialProvider" column="social_provider" />
+        <result property="socialEmail" column="social_email" /> -->    
     </resultMap>
     
+    <!-- 사용자 닉네임으로 사용자 정보를 조회 -->
     <select id="findByUserNick" parameterType="string" resultMap="reviewUserMap">
         SELECT * FROM USERS WHERE user_nick = #{userNick}
     </select>

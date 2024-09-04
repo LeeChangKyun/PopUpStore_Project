@@ -2,6 +2,7 @@ package com.popup.project.board.review.utils;
 
 public class ReviewBoardPage
 {
+	// 페이지 번호화 페이지 URL을 기반으로 페이지 네비게이션 문자열을 생성
 	public static String pagingStr(int totalCount, int pageSize, int blockPage, int pageNum, String pageUrl) {
 	    StringBuilder pagingStr = new StringBuilder();
 

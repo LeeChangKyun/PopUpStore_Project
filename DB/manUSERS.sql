@@ -24,4 +24,3 @@ CREATE TABLE USERS(
 );
 
 SELECT * FROM USERS;    
-    
