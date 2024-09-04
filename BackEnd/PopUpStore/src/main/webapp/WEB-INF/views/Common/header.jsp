@@ -8,6 +8,13 @@ String profileEditUrl = (socialProvider != null) ? "/Member/profile/SocialEdit" 
 String userId = userIdFromSession;
 String userNick = userNickFromSession;
 %>
+<% 
+    String role = (String) request.getAttribute("role");
+    if (role != null) {
+        // 첫 글자만 대문자, 나머지는 소문자로 변환
+        role = role.substring(0, 1).toUpperCase() + role.substring(1).toLowerCase();
+    }
+%>
 <header class="header d-flex justify-content-between align-items-center p-3 bg-dark text-white">
    	<h2 class="example-text brand-font-700 centered-text">
         <a href="/" style="color: #4e4f4e; text-decoration: none;">PopUpStore</a>
@@ -30,7 +37,7 @@ String userNick = userNickFromSession;
                     <a class="dropdown-item" href="#">이벤트</a> <!-- 이 부분은 조건 설정을 하지 않았습니다. -->
                 </li>
                 <li>
-                    <a class="dropdown-item" href="<%= (userId != null) ? "/promotionList" : "/Guest/auth/Login" %>">홍보문의</a>
+					<a class="dropdown-item" href="<%= (userId != null) ? "/" + role + "/promotionList" : "/Guest/auth/Login" %>">홍보문의</a>
                 </li>
             </ul>
         </div>

@@ -222,7 +222,7 @@
 	                    <c:if test="${ not empty simplebbsDTO.promotion_sfile }">
             		      <td>첨부파일</td>
 	                        <!-- 파일 다운로드 링크 -->
-	                        <a href="${pageContext.request.contextPath}/promotionDownload?promotion_ofile=${ simplebbsDTO.promotion_ofile }&promotion_sfile=${ simplebbsDTO.promotion_sfile }&promotion_num=${ simplebbsDTO.promotion_num }">
+	                        <a href="/${role}/promotionDownload?promotion_ofile=${ simplebbsDTO.promotion_ofile }&promotion_sfile=${ simplebbsDTO.promotion_sfile }&promotion_num=${ simplebbsDTO.promotion_num }">
 	                            ${ simplebbsDTO.promotion_ofile } [다운로드]
 	                        </a>
 	                    </c:if>
@@ -247,7 +247,7 @@
 
 	        // AJAX 요청을 통해 좋아요 상태 토글
 	        $.ajax({
-	            url: '/promotion/toggleLike',
+	            url: '/${role}/promotion/toggleLike',
 	            method: 'POST',
 	            data: {
 	                promotionNum: promotionNum,
@@ -339,7 +339,7 @@
                     <!-- 일반 사용자 또는 관리자 외에는 수정 및 삭제 버튼을 숨김 -->
                 </c:otherwise>
             </c:choose>
-            <button type="button" onclick="location.href='/promotionList';" class="btn btn-back">목록으로 돌아가기</button>
+            <button type="button" onclick="location.href='/Admin/promotionList';" class="btn btn-back">목록으로 돌아가기</button>
         </div>
 	</div>
 		

@@ -20,4 +20,5 @@ public class PromotionBoardDTO
 	private int visitcount; // 조회수
 	private int likeCount;
 	
+	
 }

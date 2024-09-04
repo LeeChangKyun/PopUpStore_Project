@@ -186,17 +186,7 @@
         
     </style>
     
-	<script>
-		function promotiondeletePost(promotion_num){
-		    var confirmed = confirm("정말로 삭제하겠습니까?"); 
-		    if (confirmed) {
-		        var form = document.writeFrm;      
-		        form.method = "post";  
-		        form.action = "promotionDelete";
-		        form.submit();  
-		    }
-		}
-	</script>
+
 	
 
     
@@ -222,7 +212,7 @@
 	                    <c:if test="${ not empty simplebbsDTO.promotion_sfile }">
             		      <td>첨부파일</td>
 	                        <!-- 파일 다운로드 링크 -->
-	                        <a href="${pageContext.request.contextPath}/promotionDownload?promotion_ofile=${ simplebbsDTO.promotion_ofile }&promotion_sfile=${ simplebbsDTO.promotion_sfile }&promotion_num=${ simplebbsDTO.promotion_num }">
+	                        <a href="/${role}/promotionDownload?promotion_ofile=${ simplebbsDTO.promotion_ofile }&promotion_sfile=${ simplebbsDTO.promotion_sfile }&promotion_num=${ simplebbsDTO.promotion_num }">
 	                            ${ simplebbsDTO.promotion_ofile } [다운로드]
 	                        </a>
 	                    </c:if>
@@ -247,7 +237,7 @@
 
 	        // AJAX 요청을 통해 좋아요 상태 토글
 	        $.ajax({
-	            url: '/promotion/toggleLike',
+	            url: '/${role}/promotion/toggleLike',
 	            method: 'POST',
 	            data: {
 	                promotionNum: promotionNum,
@@ -302,7 +292,7 @@
 		            <p class="comment-content">${comment.promotion_comment_content}</p>
 		            <c:choose>
 		                <c:when test="${comment.user_nick == sessionScope.userNick or sessionScope.userId == 'Admin'}">
-		                    <form action="${pageContext.request.contextPath}/promotion/promotiondeleteComment" method="post" style="display:inline;">
+		                    <form action="/${role}/promotion/promotiondeleteComment" method="post" style="display:inline;">
 		                        <input type="hidden" name="promotion_comment_id" value="${comment.promotion_comment_id}" />
 		                        <input type="hidden" name="promotion_num" value="${simplebbsDTO.promotion_num}" />
 		                        <button type="submit" class="btn btn-sm btn-danger">삭제</button>
@@ -317,7 +307,7 @@
 		<div class="divider"></div> <!-- 구분선 추가 -->
 		<div class="comment-section">
 		    <h2 class="comment-header">댓글 작성</h2>
-		    <form class="comment-form" action="${pageContext.request.contextPath}/promotion/promotionaddComment" method="post">
+		    <form class="comment-form" action="${pageContext.request.contextPath}/${role}/promotion/promotionaddComment" method="post">
 		        <input type="hidden" name="promotion_num" value="${simplebbsDTO.promotion_num}" />
 		        <div class="input-group">
 		            <textarea name="promotion_comment_content" placeholder="댓글을 입력하세요..."></textarea>
@@ -331,7 +321,7 @@
             <c:choose>
                 <c:when test="${simplebbsDTO.user_nick == sessionScope.userNick or sessionScope.userId == 'Admin'}">
                     <div class="btn-group">
-                        <button type="button" onclick="location.href='/promotionEdit?&promotion_num=${simplebbsDTO.promotion_num}';" class="btn btn-back">수정</button>
+                        <button type="button" onclick="location.href='/${role}/promotionEdit?&promotion_num=${simplebbsDTO.promotion_num}';" class="btn btn-back">수정</button>
                         <button type="button" onclick="promotiondeletePost(${simplebbsDTO.promotion_num});" class="btn btn-back">삭제</button>
                     </div>
                 </c:when>
@@ -339,9 +329,21 @@
                     <!-- 일반 사용자 또는 관리자 외에는 수정 및 삭제 버튼을 숨김 -->
                 </c:otherwise>
             </c:choose>
-            <button type="button" onclick="location.href='/promotionList';" class="btn btn-back">목록으로 돌아가기</button>
+            <button type="button" onclick="location.href='/${role}/promotionList';" class="btn btn-back">목록으로 돌아가기</button>
         </div>
 	</div>
+	
+		<script>
+	 function promotiondeletePost(promotion_num) {
+	        var confirmed = confirm("정말로 삭제하겠습니까?");
+	        if (confirmed) {
+	            var form = document.writeFrm;
+	            form.method = "post";
+	            form.action = '/${role}/promotionDelete';
+	            form.submit();
+	        }
+	    }
+	</script>
 		
 <!-- 		댓글 토글 -->
 			<script>
