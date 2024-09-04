@@ -25,11 +25,11 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException, ServletException {
-    	
+
         String username = request.getParameter("userName");
         UserDTO user = userService.getUserByUsername(username);
         String redirectUrl = "/Guest/auth/Login?error=true";
-        
+
         if (user != null) {
             // 관리자인 경우 파라미터 추가
             if ("ROLE_ADMIN".equals(userService.getUserAuthority(user.getUserId()))) {
@@ -38,23 +38,14 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
                 // 관리자가 아닌 경우 실패 횟수 증가
                 userService.increaseFailedAttempts(user, response);
             }
-
-            // 계정이 잠겨 있을 때
-            if (user.isAccountLocked()) {
-                if (!response.isCommitted()) {
-                    // 로그 추가하여 상태 확인
-                    System.out.println("계정이 잠김 상태입니다. 리다이렉트 URL에 locked 파라미터를 추가합니다.");
-                    userService.lockAccount(user.getUserId());
-                    redirectUrl = "/Member/auth/AccountAuth?locked=true";  // 잠김 상태일 때 리다이렉트 URL 설정
-                    response.sendRedirect(redirectUrl);  // 리다이렉트
-                    return;  // 리다이렉트 후 추가 처리 중단
-                }
-            }
         }
 
-        // 로그인 실패로 인해 로그인 페이지로 리다이렉트
+        // 리다이렉트하기 전에 응답이 이미 커밋되었는지 확인
         if (!response.isCommitted()) {
             response.sendRedirect(redirectUrl);
+        } else {
+            // 커밋되었을 경우, 오류 로그 출력
+            System.out.println("응답이 이미 커밋되었습니다. 리다이렉트할 수 없습니다.");
         }
     }
 }
