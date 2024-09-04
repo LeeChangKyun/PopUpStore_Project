@@ -135,7 +135,7 @@
 <div class="container">
     <div class="form-container">
         <h2 class="form-header">게시글 수정하기</h2>
-        <form name="editFrm" method="post" enctype="multipart/form-data" action="/${role}/promotionEdit" onsubmit="return validateForm(this);">
+        <form name="editFrm" method="post" enctype="multipart/form-data" action="/promotionEdit" onsubmit="return validateForm(this);">
             <input type="hidden" name="promotion_num" value="${simplebbsDTO.promotion_num}"/>
             <input type="hidden" name="prevOfile" value="${simplebbsDTO.promotion_ofile}"/>
             <input type="hidden" name="prevSfile" value="${simplebbsDTO.promotion_sfile}"/>
@@ -162,7 +162,7 @@
             </div>
             <div class="form-footer">
                 <button type="submit" class="btn btn-primary btn-custom">수정</button>
-                <button type="button" class="btn btn-secondary btn-custom" onclick="location.href='/${role}/promotionList';">목록 바로가기</button>
+                <button type="button" class="btn btn-secondary btn-custom" onclick="location.href='/promotionList';">목록 바로가기</button>
             </div>
         </form>
     </div>

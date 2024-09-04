@@ -103,7 +103,7 @@
 <div class="container">
     <div class="form-container">
         <h2 class="form-header">게시글 작성하기</h2>
-        <form name="writeFrm" method="post" enctype="multipart/form-data" action="/${role}/promotionWrite" onsubmit="return validateForm(this);">
+        <form name="writeFrm" method="post" enctype="multipart/form-data" action="/promotionWrite" onsubmit="return validateForm(this);">
           <div class="form-group">
 		        <label for="user_nick">작성자</label>
 		        <input type="text" class="form-control" id="userNick" name="userNick" value="${userNick}" readonly style="background-color: #e9ecef; cursor: not-allowed;"/>
@@ -124,7 +124,7 @@
             </div>
             <div class="form-footer">
                 <button type="submit" class="btn btn-primary btn-custom">등록</button>
-                <button type="button" class="btn btn-secondary btn-custom" onclick="location.href='/${role}/promotionList';">목록 바로가기</button>
+                <button type="button" class="btn btn-secondary btn-custom" onclick="location.href='/promotionList';">목록 바로가기</button>
 
             </div>
         </form>

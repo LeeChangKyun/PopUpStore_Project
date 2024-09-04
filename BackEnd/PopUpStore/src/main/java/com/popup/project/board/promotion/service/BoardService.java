@@ -7,33 +7,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.popup.project.board.promotion.dto.PromotionBoardDTO;
-import com.popup.project.board.promotion.dto.PromotionParameterDTO;
-
-import jakarta.servlet.http.HttpServletRequest;
+import com.popup.project.board.promotion.dto.IBoardService;
+import com.popup.project.board.promotion.dto.ParameterDTO;
+import com.popup.project.board.promotion.dto.SimpleBbsDTO;
 
 @Service
-public class PromotionBoardService {
+public class BoardService {
 
     @Autowired
-    private PromotionBoardMapper dao;
+    private IBoardService dao;
     
     @Autowired
-    private PromotionFileUploadService fileUploadService;
+    private FileUploadService fileUploadService;
     
-    public ArrayList<PromotionBoardDTO> getBoardList(PromotionParameterDTO parameterDTO) {
+    public ArrayList<SimpleBbsDTO> getBoardList(ParameterDTO parameterDTO) {
         return dao.listPage(parameterDTO);
     }
     
-    public int getTotalCount(PromotionParameterDTO parameterDTO) {
+    public int getTotalCount(ParameterDTO parameterDTO) {
         return dao.getTotalCount(parameterDTO);
     }
 
-    public PromotionBoardDTO getBoardView(PromotionBoardDTO simplebbsDTO) {
+    public SimpleBbsDTO getBoardView(SimpleBbsDTO simplebbsDTO) {
         return dao.view(simplebbsDTO);
     }
     
-    public int writePost(PromotionBoardDTO dto, MultipartFile promotionOfile, MultipartFile promotionSfile) throws IOException {
+    public int writePost(SimpleBbsDTO dto, MultipartFile promotionOfile, MultipartFile promotionSfile) throws IOException {
         if (promotionOfile != null && !promotionOfile.isEmpty()) {
             String originalOfileName = fileUploadService.getOriginalFileName(promotionOfile);
             String savedOfileName = fileUploadService.saveFile(promotionOfile);
@@ -49,15 +48,17 @@ public class PromotionBoardService {
         return dao.write(dto);
     }
 
-    public int editPost(PromotionBoardDTO dto, MultipartFile promotionOfile, String prevOfile, HttpServletRequest request) throws IOException {
-        // 새 파일이 존재할 경우
+    public int editPost(SimpleBbsDTO dto, MultipartFile promotionOfile, String prevOfile) throws IOException {
+        // 새 파일 저장
         if (promotionOfile != null && !promotionOfile.isEmpty()) {
-            // 이전 파일 삭제 (이전 파일이 있는 경우)
+            // 기존 파일 삭제 (이전 파일이 있는 경우)
             if (prevOfile != null && !prevOfile.trim().isEmpty()) {
                 try {
                     fileUploadService.deleteFile(prevOfile);
                 } catch (IllegalArgumentException e) {
+                    // 예외 처리: 로그를 남기거나 다른 처리를 수행
                     System.err.println("Error deleting file: " + e.getMessage());
+                    // 필요 시, 예외를 다시 던지거나 적절한 조치를 취할 수 있습니다.
                     throw new IOException("Failed to delete previous file: " + prevOfile, e);
                 }
             }
@@ -67,32 +68,15 @@ public class PromotionBoardService {
             dto.setPromotion_ofile(fileUploadService.getOriginalFileName(promotionOfile));
             dto.setPromotion_sfile(savedFileName);
         } else {
-            // 새 파일이 없으면 기존 파일 유지
+            // 파일이 없으면 이전 파일 이름을 그대로 사용
             dto.setPromotion_ofile(prevOfile);
         }
 
-        // 추가적인 request 기반 로직이 필요하다면 여기에서 수행할 수 있습니다.
-        // 예: request에서 파라미터를 읽어와서 처리
-
-        // 게시물 업데이트
+        // 게시글 업데이트 로직
         return dao.edit(dto);
     }
 
     public int promotiondeletePost(String promotionNum) {
-        // 게시물 삭제 로직을 구현합니다.
-        // 먼저 파일 삭제 로직이 필요할 경우 구현합니다.
-
-//        // 파일 삭제 (Optional: 파일 저장 방식에 따라 필요할 수도 있음)
-//        PromotionBoardDTO dto = dao.view(new PromotionBoardDTO());
-//        if (dto.getPromotion_sfile() != null && !dto.getPromotion_sfile().isEmpty()) {
-//            try {
-//                fileUploadService.deleteFile(dto.getPromotion_sfile());
-//            } catch (Exception e) {
-//                System.err.println("Error deleting associated files: " + e.getMessage());
-//            }
-//        }
-
-        // DB에서 게시물 삭제
         return dao.promotionDelete(promotionNum);
     }
 

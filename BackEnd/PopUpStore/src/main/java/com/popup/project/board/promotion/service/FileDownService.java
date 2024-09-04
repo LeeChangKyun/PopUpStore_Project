@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PromotionFileDownService {
+public class FileDownService {
 
     @Value("${file.upload-dir}")
     private String uploadDir;

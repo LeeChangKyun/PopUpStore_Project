@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import lombok.Data;
 
 @Data
-public class PromotionBoardDTO
+public class SimpleBbsDTO
 {
 	private String promotion_num;
 	private String user_nick;
@@ -19,6 +19,5 @@ public class PromotionBoardDTO
 	private int downcount;
 	private int visitcount; // 조회수
 	private int likeCount;
-	
 	
 }

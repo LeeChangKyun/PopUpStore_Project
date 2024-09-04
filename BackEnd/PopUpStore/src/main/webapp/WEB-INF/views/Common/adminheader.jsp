@@ -27,8 +27,8 @@ String userId = userIdFromModel != null ? userIdFromModel : userIdFromSession;
                     <a class="dropdown-item" href="#">이벤트</a> <!-- 이 부분은 조건 설정을 하지 않았습니다. -->
                 </li>
                 <li>
- 					<a class="dropdown-item" href="/Admin/promotionList">홍보문의</a>                
-				</li>
+                    <a class="dropdown-item" href="/Admin/promotionList">홍보문의</a>
+                </li>
             </ul>
         </div>
     </nav>
