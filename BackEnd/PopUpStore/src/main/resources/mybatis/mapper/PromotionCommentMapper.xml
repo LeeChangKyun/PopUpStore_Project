@@ -4,9 +4,9 @@
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.popup.project.board.promotion.service.promotionCommentMapper">
+<mapper namespace="com.popup.project.board.promotion.service.PromotionCommentMapper">
     <!-- 댓글 추가 -->
-    <insert id="promotionaddComment" parameterType="com.popup.project.board.promotion.dto.promotionCommentDTO">
+    <insert id="promotionaddComment" parameterType="com.popup.project.board.promotion.dto.PromotionCommentDTO">
         INSERT INTO PROMOTION_COMMENT (
             promotion_comment_id, 
             promotion_num, 
@@ -23,11 +23,11 @@
     </insert>
 
     <!-- 특정 프로모션에 대한 모든 댓글 조회 -->
-    <select id="getCommentsByPromotionNum" resultType="com.popup.project.board.promotion.dto.promotionCommentDTO" parameterType="String">
+    <select id="getCommentsByPromotionNum" resultType="com.popup.project.board.promotion.dto.PromotionCommentDTO" parameterType="String">
         SELECT * FROM PROMOTION_COMMENT WHERE promotion_num = #{promotion_num}
     </select>
     
-    <select id="getpromotionCommentById" resultType="com.popup.project.board.promotion.dto.promotionCommentDTO" parameterType="int">
+    <select id="getpromotionCommentById" resultType="com.popup.project.board.promotion.dto.PromotionCommentDTO" parameterType="int">
     SELECT * FROM PROMOTION_COMMENT WHERE promotion_comment_id = #{commentId}
 	</select>
     
