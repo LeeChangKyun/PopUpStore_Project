@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.popup.project.board.inquiry.dto.InquiryDTO;
 import com.popup.project.board.inquiry.dto.InquiryBoardService;
 import com.popup.project.board.inquiry.dto.InquirySimpleBbsDTO;
-import com.popup.project.board.promotion.dto.PromotionBoardDTO;
+import com.popup.project.board.promotion.dto.SimpleBbsDTO;
 
 @Service
 public class InquirysBoardService {

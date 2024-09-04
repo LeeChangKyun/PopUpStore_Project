@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-public class PromotionFileUploadService {
+public class FileUploadService {
 
     @Value("${file.upload-dir}")
     private String uploadDir;
