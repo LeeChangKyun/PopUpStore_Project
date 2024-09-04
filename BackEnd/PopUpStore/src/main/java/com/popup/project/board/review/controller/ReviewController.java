@@ -101,12 +101,9 @@ public class ReviewController {
         // 역할(role)에 맞는 리스트 페이지로 이동
         return role + "/review/reviewList";
     }
-<<<<<<< HEAD
     
-=======
 
     // 상세 페이지
->>>>>>> feature/c1
     @GetMapping("/{role}/review/reviewView")
     public String reviewViewPost(
             @PathVariable("role") String role, 
