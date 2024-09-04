@@ -3,7 +3,7 @@ package com.popup.project.board.promotion.service;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PagingService {
+public class PromotionPagingService {
 
     public static final int PAGE_SIZE = 10;
     public static final int BLOCK_PAGE = 2;

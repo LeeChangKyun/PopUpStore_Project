@@ -5,7 +5,7 @@ import java.sql.Date;
 import lombok.Data;
 
 @Data
-public class promotionCommentDTO {
+public class PromotionCommentDTO {
     private int promotion_comment_id;
     private String promotion_num;
     private String user_nick;
