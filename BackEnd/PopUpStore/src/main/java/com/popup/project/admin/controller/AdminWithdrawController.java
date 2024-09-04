@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.popup.project.member.dto.UserDTO;
-import com.popup.project.member.dto.UserMapper;
+import com.popup.project.member.mapper.UserMapper;
 
 import jakarta.servlet.http.HttpSession;
 

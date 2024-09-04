@@ -22,9 +22,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.popup.project.member.auth.CustomUserDetails;
 import com.popup.project.member.dto.UserDTO;
-import com.popup.project.member.dto.UserMapper;
+import com.popup.project.member.mail.MailService;
+import com.popup.project.member.mapper.UserMapper;
 import com.popup.project.member.service.UserService;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
@@ -39,6 +41,9 @@ public class UserRegisterController {
 	
 	@Autowired
 	private BCryptPasswordEncoder pwEncoder;
+	
+	@Autowired
+	private MailService mailService;
 	
 	// 회원가입페이지
 	@GetMapping("register_form")
@@ -59,25 +64,25 @@ public class UserRegisterController {
 	}
 	
 	// 아이디 찾기
-		@GetMapping("/FindId")
-		@ResponseBody
-		public Map<String, String> FindId(@RequestParam("name") String name, @RequestParam("phone") String phone) {
-		    Map<String, String> response = new HashMap<>();
-		    try {
-		        String userId = userService.FindId(name, phone);
-		        System.out.println("userId: " + userId);  // 로그로 결과 확인
-		        if (userId != null) {
-		            response.put("status", "success");
-		            response.put("userId", userId);
-		        } else {
-		            response.put("status", "not found");
-		        }
-		    } catch (Exception e) {
-		        response.put("status", "error");
-		        response.put("message", e.getMessage());
-		    }
-		    return response;
-		}
+	@GetMapping("/FindId")
+	@ResponseBody
+	public Map<String, String> FindId(@RequestParam("name") String name, @RequestParam("phone") String phone) {
+	    Map<String, String> response = new HashMap<>();
+	    try {
+	        String userId = userService.FindId(name, phone);
+	        System.out.println("userId: " + userId);  // 로그로 결과 확인
+	        if (userId != null) {
+	            response.put("status", "success");
+	            response.put("userId", userId);
+	        } else {
+	            response.put("status", "not found");
+	        }
+	    } catch (Exception e) {
+	        response.put("status", "error");
+	        response.put("message", e.getMessage());
+	    }
+	    return response;
+	}
 	
 	// 아이디 중복확인 
 	@PostMapping("/CheckUserId")
@@ -260,5 +265,70 @@ public class UserRegisterController {
         return "redirect:/";
     }
 	
+    // 추가 인증 페이지 보여주기 (GET)
+    @GetMapping("/Member/auth/AccountAuth")
+    public String showAccountAuthPage(Model model) {
+        model.addAttribute("message", "계정이 잠겼습니다. 이메일로 받은 인증 코드를 입력하세요.");
+        return "/Member/auth/AccountAuth"; // 인증 페이지로 이동
+    }
+    
+    @PostMapping("/AuthCode")
+    public ResponseEntity<Map<String, Boolean>> verifyAuthCode(@RequestBody Map<String, String> request, HttpSession session) throws MessagingException {
+        System.out.println("verifyAuthCode method start.");
+
+        String authCode = request.get("authCode");
+        System.out.println("Auth Code received: " + authCode);
+
+        String savedAuthCode = (String) session.getAttribute("authNumber");
+        String email = (String) session.getAttribute("email");
+        System.out.println("Saved Auth Code: " + savedAuthCode);
+        System.out.println("Email in session: " + email);
+
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("유효한 이메일 주소가 필요합니다.");
+        }
+
+        Map<String, Boolean> response = new HashMap<>();
+
+        if (savedAuthCode != null && savedAuthCode.trim().equals(authCode)) {
+            response.put("verified", true);
+            session.removeAttribute("authNumber");
+            System.out.println("Auth code verified, sending temp password.");
+            
+            // 임시 비밀번호 발송
+            try {
+                System.out.println("Calling sendTempPasswordAsync for email: " + email);
+                mailService.sendTempPasswordAsync(email, session, userService);
+                System.out.println("Async call made for sending temp password.");
+            } catch (Exception e) {
+                System.err.println("Error sending temp password: " + e.getMessage());
+                e.printStackTrace();
+                response.put("error", true);
+                response.put("verified", false);
+                return ResponseEntity.ok(response);
+            }
+
+            // 계정 잠금 해제 및 실패 시도 횟수 초기화
+            try {
+                System.out.println("Unlocking account and resetting attempts for email: " + email);
+                userService.unlockAccountByEmailAndResetAttempts(email);
+                System.out.println("Account unlocked and attempts reset.");
+            } catch (Exception e) {
+                System.err.println("Error unlocking account: " + e.getMessage());
+                e.printStackTrace();
+                response.put("error", true);
+                response.put("verified", false);
+                return ResponseEntity.ok(response);
+            }
+        } else {
+            response.put("verified", false);
+            System.out.println("Auth code verification failed.");
+        }
+
+        System.out.println("Preparing to send response.");
+        return ResponseEntity.ok(response);
+    }
+    
+ }
+    
 	
-}

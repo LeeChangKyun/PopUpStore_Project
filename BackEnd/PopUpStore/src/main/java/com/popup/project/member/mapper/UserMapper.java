@@ -1,9 +1,11 @@
-package com.popup.project.member.dto;
+package com.popup.project.member.mapper;
 
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import com.popup.project.member.dto.UserDTO;
 
 @Mapper
 public interface UserMapper {
@@ -48,5 +50,20 @@ public interface UserMapper {
 
     // 소셜 로그인 사용자의 정보를 업데이트하는 메서드
     int updateUserBySocialIdAndProvider(UserDTO user);
+    
+    void updateFailedAttempts(@Param("failedAttempts") int failedAttempts, @Param("userId") String userId);
 
+    void lockAccount(@Param("userId") String userId);
+
+    void unlockAccount(@Param("userId") String userId);
+
+    // Admin 권한 확인 메서드
+    String getUserAuthority(@Param("userId") String userId);
+    
+    int getFailedAttempts(@Param("userId") String userId);
+    
+    public void unlockAccountByEmail(String email);
+
+    public void resetFailedAttemptsByEmail(@Param("email") String email);
+    
 }

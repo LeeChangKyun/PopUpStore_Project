@@ -97,7 +97,7 @@ public class ReviewController {
         
         return role + "/review/reviewList";
     }
-
+    
     @GetMapping("/{role}/review/reviewView")
     public String reviewViewPost(
             @PathVariable("role") String role, 
