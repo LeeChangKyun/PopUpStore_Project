@@ -5,6 +5,7 @@
 
 <mapper namespace="com.popup.project.board.review.model.ReviewBoardMapper">
 
+	<!-- ReviewBoard 객체와 데이터베이스 테이블 간의 매핑을 정의 -->
     <resultMap id="reviewBoardResultMap" type="com.popup.project.board.review.model.ReviewBoard">
         <id property="reviewNum" column="review_num"/>
         <result property="reviewTitle" column="review_title"/>
@@ -44,7 +45,7 @@
         SELECT * FROM REVIEWS_BOARD WHERE review_num = #{reviewNum}
     </select>
     
-    <!-- 게시물 갯수 조회 -->
+    <!-- 게시물 개수 조회 -->
     <select id="selectCount" resultType="int">
         SELECT COUNT(*) FROM REVIEWS_BOARD
     </select>
@@ -65,7 +66,7 @@
         UPDATE REVIEWS_BOARD SET review_viewcount = review_viewcount + 1 WHERE review_num = #{reviewNum}
     </update>
 
-    <!-- 좋아요 수 증가 -->
+    <!-- 게시문 좋아요 수 증가 -->
     <update id="incrementLikeCount">
         UPDATE REVIEWS_BOARD SET review_likecount = review_likecount + 1 WHERE review_num = #{reviewNum}
     </update>
@@ -85,5 +86,12 @@
         FROM REVIEWS_BOARD
         WHERE ${searchField} LIKE '%' || #{searchWord} || '%'
     </select>
+    
+    <!-- 게시물 수정에서 업로드된 파일 삭제 -->
+    <update id="deleteFileInfo" parameterType="int">
+        UPDATE REVIEWS_BOARD
+        SET review_ofile = NULL, review_sfile = NULL
+        WHERE review_num = #{reviewNum}
+    </update>
     
 </mapper>

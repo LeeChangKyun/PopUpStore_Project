@@ -5,6 +5,7 @@
 
 <mapper namespace="com.popup.project.board.review.model.ReviewCommentMapper">
 
+    <!-- ReviewComment 객체와 데이터베이스 테이블 간의 매핑을 정의 -->
     <resultMap id="reviewCommentResultMap" type="com.popup.project.board.review.model.ReviewComment">
         <id property="commentId" column="comment_id"/>
         <result property="reviewNum" column="review_num"/>
@@ -44,6 +45,5 @@
         FROM REVIEWS_COMMENTS
         WHERE comment_id = #{commentId}
     </select>
-    
-    
+        
 </mapper>

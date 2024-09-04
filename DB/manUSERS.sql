@@ -25,9 +25,13 @@ CREATE TABLE USERS(
     account_locked NUMBER(1) DEFAULT 0 
 );
 
+<<<<<<< HEAD
 SELECT * FROM USERS;      
     
 SELECT ACCOUNT_LOCKED, FAILED_ATTEMPTS
 FROM USERS
 WHERE USER_ID = 'lckdrbs';
 
+=======
+SELECT * FROM USERS;    
+>>>>>>> feature/c1

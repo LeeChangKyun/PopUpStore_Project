@@ -31,6 +31,10 @@ public class ReviewUploadService {
         }
     }
 
+    // 허용할 이미지 MIME 타입 목록
+    private static final List<String> ALLOWED_MIME_TYPES = List.of("image/jpeg", "image/png", "image/gif", "image/bmp",	"image/JPEG", "image/PNG", "image/GIF", "image/BMP");
+
+    // 파일을 저장하고 저장된 파일의 이름 리스트를 반환
     public List<String> saveFiles(List<MultipartFile> files) throws IOException {
         if (files == null || files.isEmpty()) {
             return Collections.emptyList();
@@ -40,6 +44,13 @@ public class ReviewUploadService {
             if (file.isEmpty()) {
                 return null;
             }
+
+            // 파일의 MIME 타입을 확인하여 이미지 파일만 허용
+            String mimeType = file.getContentType();
+            if (!ALLOWED_MIME_TYPES.contains(mimeType)) {
+                throw new RuntimeException("허용되지 않은 파일 형식입니다: " + mimeType);
+            }
+
             String uniqueFilename = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
             Path filePath = Paths.get(UPLOAD_DIR, uniqueFilename);
             try {
@@ -52,15 +63,15 @@ public class ReviewUploadService {
           .collect(Collectors.toList());
     }
 
+    // 파일 삭제
     public void deleteFile(String fileName) {
         if (fileName != null && !fileName.isEmpty()) {
-            File file = new File("파일저장경로/" + fileName);
-            if (file.exists()) {
-                if (file.delete()) {
-                    System.out.println("파일이 성공적으로 삭제되었습니다.");
-                } else {
-                    System.out.println("파일 삭제에 실패하였습니다.");
-                }
+            Path filePath = Paths.get(UPLOAD_DIR, fileName);
+            try {
+                Files.deleteIfExists(filePath);
+                System.out.println("파일이 성공적으로 삭제되었습니다.");
+            } catch (IOException e) {
+                System.out.println("파일 삭제에 실패하였습니다: " + e.getMessage());
             }
         }
     }
