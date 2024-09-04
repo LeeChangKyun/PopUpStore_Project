@@ -4,7 +4,7 @@
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.popup.project.member.dto.UserMapper">
+<mapper namespace="com.popup.project.member.mapper.UserMapper">
     <select id="AdmingetAllUsers" resultType="com.popup.project.member.dto.UserDTO">
 	    SELECT user_id AS userId,
 	           user_nick AS userNick,

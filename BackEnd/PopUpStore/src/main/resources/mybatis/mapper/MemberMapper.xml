@@ -11,7 +11,7 @@
 <!-- MyUserDTO를 IMyUserDao에 넣는다.
 (namespace는 이 매퍼가 어떤 인터페이스와 관련된 매퍼인지를 알려준다)-->
 
-<mapper namespace="com.popup.project.member.dto.UserMapper"> 
+<mapper namespace="com.popup.project.member.mapper.UserMapper"> 
 	
 	<insert id="register">
     INSERT INTO USERS
@@ -106,7 +106,9 @@
 	        USER_ADDRESS as userAddress,
 	        USER_CREATE_DATE as userCreatedate,
 	        AUTHORITY as userAuthority,
-	        ENABLED as enabled
+	        ENABLED as enabled,
+	        FAILED_ATTEMPTS as failedAttempts,
+	        ACCOUNT_LOCKED AS accountLocked
 	    FROM users 
 	    WHERE user_id = #{userId}
 	</select>
@@ -182,4 +184,50 @@
 	    WHERE social_id = #{socialId}
 	    AND social_provider = #{socialProvider}
 	</update>
+	
+	<update id="updateFailedAttempts">
+        UPDATE USERS
+        SET FAILED_ATTEMPTS = #{failedAttempts}
+        WHERE USER_ID = #{userId}
+    </update>
+
+    <!-- 계정 잠금 처리 -->
+    <update id="lockAccount">
+        UPDATE USERS
+        SET ACCOUNT_LOCKED = 1
+        WHERE USER_ID = #{userId}
+    </update>
+
+    <!-- 계정 잠금 해제 -->
+    <update id="unlockAccount">
+        UPDATE USERS
+        SET ACCOUNT_LOCKED = 0, FAILED_ATTEMPTS = 0
+        WHERE USER_ID = #{userId}
+    </update>
+
+    <!-- Admin 권한 확인 -->
+    <select id="getUserAuthority" parameterType="String" resultType="String">
+        SELECT AUTHORITY 
+        FROM USERS 
+        WHERE USER_ID = #{userId}
+    </select>
+	
+	<select id="getFailedAttempts" parameterType="String" resultType="int">
+	    SELECT FAILED_ATTEMPTS
+	    FROM USERS
+	    WHERE USER_ID = #{userId}
+	</select>
+	
+	<update id="unlockAccountByEmail">
+	    UPDATE USERS
+	    SET ACCOUNT_LOCKED = 0, FAILED_ATTEMPTS = 0
+	    WHERE USER_EMAIL = #{email}
+	</update>
+	
+	<update id="resetFailedAttemptsByEmail">
+	    UPDATE USERS
+	    SET FAILED_ATTEMPTS = 0
+	    WHERE USER_EMAIL = #{email}
+	</update>
+	
 </mapper>

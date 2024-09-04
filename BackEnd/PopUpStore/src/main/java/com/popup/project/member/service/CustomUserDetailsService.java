@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.popup.project.member.auth.CustomUserDetails;
 import com.popup.project.member.dto.UserDTO;
-import com.popup.project.member.dto.UserMapper;
+import com.popup.project.member.mapper.UserMapper;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
