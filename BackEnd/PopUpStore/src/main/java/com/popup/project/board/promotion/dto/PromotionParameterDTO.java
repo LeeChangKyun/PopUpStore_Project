@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ParameterDTO {	
+public class PromotionParameterDTO {	
 	private String searchField;  
 	private String searchKeyword;
 	private int start;		 

@@ -181,7 +181,7 @@
 				            	${vNum}
 				            </td>
 				            <td align="center"> 
-				                <a href="/promotionView?promotion_num=${row.promotion_num}&vNum=${vNum}">${ row.promotion_title }</a> 
+				                <a href="/${role}/promotionView?promotion_num=${row.promotion_num}&vNum=${vNum}">${row.promotion_title}</a>
 				            </td> 
 				            <td>${ row.user_nick }</td> 
 				            <td>${ row.visitcount }</td> 
@@ -193,7 +193,7 @@
             </tbody>
         </table>
    <div class="write-button">
-            <button type="button" class="btn btn-primary" onclick="location.href='/promotionWrite';">글쓰기</button>
+            <button type="button" class="btn btn-primary" onclick="location.href='/${role}/promotionWrite';">글쓰기</button>
    </div>
     </div>
 	<!-- 페이지 네비게이션 -->
