@@ -2,7 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ page isELIgnored="false" %>
-<%@ include file="/WEB-INF/views/Common/adminheader.jsp" %>
+<%@ include file="/WEB-INF/views/Common/header.jsp" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -12,9 +12,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-	<link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css">
+	 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css">
     <style>
-        
+      
         .dropdown-toggle::after {
             content: none; /* 기본 화살표 숨김 */
         }
@@ -27,8 +28,7 @@
             display: inline-block; /* 인라인 블록 요소로 변경 */
             padding: 5px 10px; /* 원하는 패딩 값으로 조정 */
         }
-        
-
+       
         /* ====================헤더푸터css끝============================================================== */
 
 
@@ -167,6 +167,23 @@
         .icon-group svg {
             cursor: pointer;
         }
+        
+/*         좋아요 스타일 */
+        .icon-group svg {
+		    width: 24px;
+		    height: 24px;
+		    color: #060606; /* 기본 아이콘 색상 */
+		    cursor: pointer;
+		}
+		
+		.icon-group .liked svg {
+		    color: #e25555; /* 빨간색 하트 색상 */
+		}
+		
+		.icon-group .not-liked svg {
+		    color: #060606; /* 기본 색상 */
+		}
+        
     </style>
     
 	<script>
@@ -180,6 +197,8 @@
 		    }
 		}
 	</script>
+	
+
     
 </head>
 <body>
@@ -203,7 +222,7 @@
 	                    <c:if test="${ not empty simplebbsDTO.promotion_sfile }">
             		      <td>첨부파일</td>
 	                        <!-- 파일 다운로드 링크 -->
-	                        <a href="${pageContext.request.contextPath}/Admin/promotionDownload?promotion_ofile=${ simplebbsDTO.promotion_ofile }&promotion_sfile=${ simplebbsDTO.promotion_sfile }&promotion_num=${ simplebbsDTO.promotion_num }">
+	                        <a href="/${role}/promotionDownload?promotion_ofile=${ simplebbsDTO.promotion_ofile }&promotion_sfile=${ simplebbsDTO.promotion_sfile }&promotion_num=${ simplebbsDTO.promotion_num }">
 	                            ${ simplebbsDTO.promotion_ofile } [다운로드]
 	                        </a>
 	                    </c:if>
@@ -215,12 +234,57 @@
 	            </tr>
 		    </table>
 
-		  <!-- 아이콘 및 댓글 수 표시 -->
+
+	<script>
+	document.addEventListener("DOMContentLoaded", function() {
+	    var likeIcon = document.getElementById('like-icon');
+	    var likeCount = document.getElementById('like-count');
+
+	    likeIcon.addEventListener('click', function() {
+	        var promotionNum = ${simplebbsDTO.promotion_num};
+	        var userNick = '${sessionScope.userNick}';
+	        var userLiked = ${userLiked}; // 서버에서 전달된 값
+
+	        // AJAX 요청을 통해 좋아요 상태 토글
+	        $.ajax({
+	            url: '/${role}/promotion/toggleLike',
+	            method: 'POST',
+	            data: {
+	                promotionNum: promotionNum,
+	                userNick: userNick
+	            },
+	            success: function(response) {
+	                // 응답 처리
+	                likeCount.textContent = response.likeCount + '좋아요';
+	                if (response.userLiked) {
+	                    likeIcon.classList.add('liked');
+	                    likeIcon.classList.remove('not-liked');
+	                } else {
+	                    likeIcon.classList.add('not-liked');
+	                    likeIcon.classList.remove('liked');
+	                }
+	            },
+	            error: function(jqXHR, textStatus, errorThrown) {
+	                console.error('Error during AJAX request:', textStatus, errorThrown);
+	            }
+	        });
+	    });
+	});
+</script>
+		  <!-- 아이콘 좋아요 댓글 -->
 		<div class="icon-group">
-		    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
-		        <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
-		    </svg>
-		    <p>좋아요 10</p>
+			
+<!-- 			좋아요 -->
+			 <button id="like-icon" class="btn btn-link ${userLiked ? 'liked' : 'not-liked'}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314"/>
+                    </svg>
+                    </button>
+                    <p id="like-count">${simplebbsDTO.likeCount}좋아요</p>
+		   
+		   
+		   
+<!-- 		   댓글 -->
 		    <svg id="comment-toggle-icon" onclick="toggleComments()" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-dots-fill" viewBox="0 0 16 16">
 		        <path d="M16 8c0 3.866-3.582 7-8 7a9 9 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7M5 8a1 1 0 1 0-2 0 1 1 0 0 0 2 0m4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
 		    </svg>
@@ -261,7 +325,23 @@
 		        </div>
 		    </form>
 		</div>
-		
+          <!-- 버튼 그룹 -->
+        <div class="action-buttons">
+            <!-- 수정 및 삭제 버튼 조건부 표시 -->
+            <c:choose>
+                <c:when test="${simplebbsDTO.user_nick == sessionScope.userNick or sessionScope.userId == 'Admin'}">
+                    <div class="btn-group">
+                        <button type="button" onclick="location.href='/Admin/promotionEdit?&promotion_num=${simplebbsDTO.promotion_num}';" class="btn btn-back">수정</button>
+                        <button type="button" onclick="promotiondeletePost(${simplebbsDTO.promotion_num});" class="btn btn-back">삭제</button>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <!-- 일반 사용자 또는 관리자 외에는 수정 및 삭제 버튼을 숨김 -->
+                </c:otherwise>
+            </c:choose>
+            <button type="button" onclick="location.href='/Admin/promotionList';" class="btn btn-back">목록으로 돌아가기</button>
+        </div>
+	</div>
 		
 <!-- 		댓글 토글 -->
 			<script>
@@ -281,26 +361,8 @@
 			</script>
 		
 		
-          <!-- 버튼 그룹 -->
-        <div class="action-buttons">
-            <!-- 수정 및 삭제 버튼 조건부 표시 -->
-            <c:choose>
-                <c:when test="${simplebbsDTO.user_nick == sessionScope.userNick or sessionScope.userId == 'Admin'}">
-                    <div class="btn-group">
-						<button type="button" onclick="location.href='/Admin/promotionEdit?&promotion_num=${simplebbsDTO.promotion_num}';" class="btn btn-back">수정</button>
-                        <button type="button" onclick="promotiondeletePost(${simplebbsDTO.promotion_num});" class="btn btn-back">삭제</button>
-                    </div>
-                </c:when>
-                <c:otherwise>
-                    <!-- 일반 사용자 또는 관리자 외에는 수정 및 삭제 버튼을 숨김 -->
-                </c:otherwise>
-            </c:choose>
-            <button type="button" onclick="location.href='/Admin/promotionList';" class="btn btn-back">목록으로 돌아가기</button>
-        </div>
     </div>
-   </div>
- 
-
+    
 
     <!-- 푸터 시작 -->
     <%@ include file="/WEB-INF/views/Common/footer.jsp" %>
