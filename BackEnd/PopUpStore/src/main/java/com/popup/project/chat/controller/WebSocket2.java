@@ -27,12 +27,9 @@ public class WebSocket2 {
 
         clients.put(userName, session);
 
-        try {
-            session.getBasicRemote().sendText("Connection Established with user: " + userName);
-        } catch (IOException e) {
-            e.printStackTrace();
+     
         }
-    }
+    
 
     @OnClose
     public void onClose(Session session, @PathParam("username") String userName) {
@@ -42,7 +39,7 @@ public class WebSocket2 {
 
     @OnMessage
     public void onMessage(String message, Session session, @PathParam("username") String userName) {
-        System.out.println("Message from " + userName + ": " + message);
+        System.out.println("Message from " + " : " + message);
 
         // 메시지가 "targetUser|message" 형식인 경우 분할
         String[] parts = message.split("\\|", 2);

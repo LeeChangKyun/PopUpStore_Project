@@ -9,8 +9,8 @@ import org.springframework.web.socket.server.standard.ServerEndpointExporter;
 @Controller
 public class chatcontroller {
 
-    @RequestMapping("chatLogin")
-    public String loginPage(Model model) {
+    @RequestMapping("/chatLogin")
+    public String chatLoginPage(Model model) {
         return "chatLogin";
     }
 

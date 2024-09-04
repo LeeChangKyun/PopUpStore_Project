@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css">
     <title>MapPage</title>
     <style>
     
@@ -43,106 +44,7 @@
             
         }
         
-        .header {
-            /* 헤더를 고정하고 상단에 배치하며, 다른 요소 위에 위치하도록 z-index 설정 */
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background-color: #343a40; /* 헤더 배경색을 어두운 회색으로 설정 */
-            border: none; /* 헤더의 테두리 제거 */
-            
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 70px; /* 헤더 높이 설정 */
-            box-sizing: border-box;
-        }
-
-        .nav {
-            /* 내비게이션 바의 항목들을 가로로 배치하고, 간격을 설정하며, 중앙에 정렬 */
-            display: flex;
-            gap: 50px;
-            align-items: center;
-            justify-content: center;
-            flex-grow: 1;
-        }
-
-        .nav a, .nav .dropdown-toggle {
-            /* 내비게이션 링크와 드롭다운 버튼의 스타일 설정: 텍스트 색상, 폰트 크기, 중앙 정렬 */
-            text-decoration: none;
-            color: #fff;
-            font-size: 16px;
-            position: relative;
-            background: none;
-            display: flex;
-            align-items: center;
-            line-height: 1.5;
-            letter-spacing: 0.5px;
-        }
-
-        .nav .dropdown-menu {
-            /* 드롭다운 메뉴의 초기 상태를 숨김, 위치를 절대적으로 설정 */
-            display: none;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            top: 100%;
-            z-index: 1000;
-        }
-
-        .nav .dropdown-menu.show {
-            /* 드롭다운 메뉴가 표시되었을 때 display를 block으로 변경 */
-            display: block;
-        }
-
-        .nav a:last-child {
-            /* 내비게이션의 마지막 링크를 왼쪽으로 조금 이동 */
-            margin-left: -5px;
-        }
-
-        .nav a.beta {
-            /* beta 링크의 색상, 배경색, 여백 및 둥근 모서리 설정 */
-            color: #2196F3;
-            background-color: #E3F2FD;
-            padding: 3px 5px;
-            border-radius: 3px;
-        }
-
-        .nav .dropdown-toggle {
-            /* 드롭다운 버튼의 테두리 색상 및 그림자 제거 */
-            outline: none;
-            box-shadow: none;
-            border-color: transparent;
-        }
-
-        .nav .dropdown-toggle:hover {
-            /* 드롭다운 버튼에 마우스를 올렸을 때 텍스트 색상을 파란색으로 변경 */
-            color: #2196F3;
-        }
-
-        .auth {
-            /* 인증 섹션의 항목들을 가로로 배치하고, 간격을 설정 */
-            display: flex;
-            gap: 15px;
-            margin-left: 80px;
-        }
-
-        .auth a {
-            /* 인증 링크의 스타일 설정: 텍스트 색상, 폰트 크기, 중앙 정렬 */
-            text-decoration: none;
-            color: #fff;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-        }
-
-        .auth button {
-            /* 인증 버튼의 배경 및 테두리 제거, 마우스 커서를 포인터로 설정 */
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-        }
+       
         .dropdown-toggle::after {
             content: none; /* 기본 화살표 숨김 */
         }
@@ -155,53 +57,7 @@
             display: inline-block; /* 인라인 블록 요소로 변경 */
             padding: 5px 10px; /* 원하는 패딩 값으로 조정 */
         }
-         main {
-		    flex: 1;
-		    /* 본문 내용과 푸터 사이의 여백을 추가하여 푸터가 페이지 하단에 위치하도록 함 */
-		    padding-bottom: 80px; /* 푸터의 높이만큼 여백 추가 */
-		}
-		
-		
-		
-        footer {
-            /* 푸터의 상하 패딩 설정, 텍스트 중앙 정렬, 배경색 및 경계선 제거 */
-           padding: 20px;
-		    text-align: center;
-		    background-color: #343a40;
-		    border-top: none;
-		    width: 100%;
-		    position: relative; /* 문서 흐름에 맞게 배치 */
-        }
-
-        footer p {
-            /* 푸터의 문단 여백을 줄이고, 텍스트 색상을 흰색으로 설정 */
-            margin: 5px 0;
-            color: #fff;
-        }
-
-        footer .footer-nav {
-            /* 푸터 내비게이션의 항목들을 가로로 배치하고, 간격을 설정 */
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 10px;
-        }
-
-        footer .footer-nav a {
-            /* 푸터 내비게이션 링크에 밑줄을 추가하고, 텍스트 색상을 흰색으로 설정 */
-            text-decoration: underline;
-            color: #fff;
-        }
-        /* SVG 아이콘 드롭다운 위치 수정 */
-        .auth .dropdown-menu {
-            right: 0; /* 오른쪽으로 정렬 */
-            left: auto; /* 기본값은 왼쪽이므로 오른쪽으로 이동 */
-        }
-        /* SVG 아이콘 호버 색상 변경 */
-        .auth .dropdown-toggle:hover svg {
-            fill: #2196F3; /* SVG 아이콘의 색상 변경 */
-        }
-
+         
         #map {
             width: 80%;
             height: 500px; /* 원하는 높이로 설정 */

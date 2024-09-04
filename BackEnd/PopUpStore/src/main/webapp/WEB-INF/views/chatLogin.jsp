@@ -1,7 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page isELIgnored="false" %>
-<%-- <%@ include file="/WEB-INF/views/Common/header.jsp" %> <!-- 헤더 파일 포함 --> --%>
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -11,7 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css">
     <style>
-        /* 폰트 정의 */
+       
         @font-face {
             font-family: 'SUIT';
             src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Bold.woff2') format('woff2');
@@ -150,27 +149,29 @@
             alert("로그인에 실패했습니다. 아이디나 비밀번호를 확인해주세요.");
         }
     });
+    
     </script>
 </head>
 <body>
     <div class="container mt-5">
         <div class="login-page">
             <h2 class="example-text brand-font-700 centered-text">
-		        <a href="/" style="color: #4e4f4e; text-decoration: none;">PoPupStore</a>
+		        <a href="/" style="color: #4e4f4e; text-decoration: none;">PopUpStore</a>
 		    </h2>
-            <form class="login-form" id="login-form" method="post" action="/Login">
+            <!-- 기존의 로그인 폼을 대체할 부분 -->
+            <form name="login_form" id="login-form" method="post" action="client">
                 <div class="mb-3">
                     <label for="login-id" class="form-label">아이디</label>
-                    <input type="text" class="form-control" id="login-id" name="userName" required>
+                    <input type="text" class="form-control" id="login-id" name="id" value="<%=session.getAttribute("id") != null ? session.getAttribute("id") : "" %>" required>
                 </div>
                 <br />
                 <div class="mb-3">
                     <label for="login-pwd" class="form-label">비밀번호</label>
-                    <input type="password" class="form-control" id="password" name="userPwd" required>
+                    <input type="password" class="form-control" id="login-pwd" name="pw" required>
                 </div>
                 <br />
                 <div class="d-grid gap-2">    
-                    <button type="submit" class="btn btn-secondary login-btn">로그인</button>
+                    <input type="button" value="로그인" class="btn btn-secondary login-btn" onclick="document.login_form.submit();">
                 </div>
             </form>
             
@@ -202,5 +203,6 @@
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
 </body>
 </html>

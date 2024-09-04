@@ -68,6 +68,11 @@ public class MainController {
         }
         return "Cart"; // /WEB-INF/views/Cart.jsp로 이동
     }
+    @RequestMapping("/PopupPage")
+    public String PopupPage(Model model) {
+        // 여기에 필요한 모델 속성 추가
+        return "PopupPage";
+    }
     
     @RequestMapping("/GoodsDetail")
     public String goodsDetail(Model model) {

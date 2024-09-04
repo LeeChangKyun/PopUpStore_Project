@@ -14,7 +14,7 @@ String userNick = userNickFromSession;
     </h2>
     <nav class="nav">
         <a href="#">소개</a>	
-        <a href="#">팝업스토어</a>
+        <a href="/PopupPage">팝업스토어</a>
         <a href="/Map">위치찾기</a>
         <a href="/GoodsShop">온라인스토어</a>
         <div class="dropdown" style="position: relative;">

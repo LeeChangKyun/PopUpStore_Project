@@ -444,12 +444,7 @@
 	            </div>
 	            <br/><br/><br/><br/><br/><br/>
 	    </div>
-	     <div>
-        <div id="messages"></div>
-		    <input type="text" id="userNick" placeholder="Your Nickname" />
-		    <input type="text" id="content" placeholder="Message" />
-		    <button onclick="sendMessage()">Send</button>
-    </div>
+	    
     <div id="messages"></div>
 	    </section>  
 	            <!-- Swiper JS -->
@@ -516,52 +511,7 @@
 	    </script>
 	    
 	    <script>
-	    function sendMessage() {
-	        var content = document.getElementById('content').value;
-	        var userNick = document.getElementById('userNick').value;
 
-	        fetch('/chat/send', {
-	            method: 'POST',
-	            headers: {
-	                'Content-Type': 'application/json'
-	            },
-	            body: JSON.stringify({
-	                content: content,
-	                userNick: userNick,
-	                timestamp: new Date().toISOString()
-	            })
-	        }).then(function() {
-	            document.getElementById('content').value = '';
-	            loadMessages(); // 메시지를 전송한 후 다시 로드
-	        }).catch(function(error) {
-	            console.error('Error sending message:', error);
-	        });
-	    }
-
-	    function loadMessages() {
-	        fetch('/chat/messages')
-	            .then(response => response.json())
-	            .then(data => {
-	                var messagesDiv = document.getElementById('messages');
-	                messagesDiv.innerHTML = '';
-
-	                console.log('Loaded messages:', data); // 디버깅용 로그
-
-	                if (Array.isArray(data)) {
-	                    data.forEach(function(message) {
-	                        var messageElement = document.createElement('div');
-	                        messageElement.innerText = `[${message.timestamp}] ${message.userNick}: ${message.content}`;
-	                        messagesDiv.appendChild(messageElement);
-	                    });
-	                } else {
-	                    console.error("Expected an array but received:", data);
-	                    messagesDiv.innerText = 'Failed to load messages.';
-	                }
-	            }).catch(function(error) {
-	                console.error('Error loading messages:', error);
-	            });
-	    }
-	    
 	    window.onload = function() {
 	        const urlParams = new URLSearchParams(window.location.search);
 	        if (urlParams.has('signupSuccess') && urlParams.get('signupSuccess') === 'true') {
