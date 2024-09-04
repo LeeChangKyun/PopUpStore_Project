@@ -6,7 +6,7 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <!-- Controller가 호출하는 인터페이스의 위치를 user_nickspace로 설정 -->
-<mapper namespace="com.popup.project.board.promotion.dto.IBoardService">
+<mapper namespace="com.popup.project.board.promotion.service.PromotionBoardMapper">
 	
 	<!--  
 	목록에서 게시물의 갯수를 카운트한다. count() 함수를 사용하므로 resultType은
@@ -14,7 +14,7 @@
 	명시되어있다. 
 	-->
 	<select id="getTotalCount" resultType="int" 
-		parameterType="com.popup.project.board.promotion.dto.ParameterDTO">
+		parameterType="com.popup.project.board.promotion.dto.PromotionParameterDTO">
 		SELECT COUNT(*) from PROMOTION_BOARD
 		<!-- 검색어가 있는 경우에만 where절을 동적으로 추가한다. -->
 		<if test="searchKeyword!=null 
@@ -29,8 +29,8 @@
 		저장한 후 2차로 List에 추가하여 반환해준다. 
 	-->
 	<select id="listPage" 
-		resultType="com.popup.project.board.promotion.dto.SimpleBbsDTO"
-		parameterType="com.popup.project.board.promotion.dto.ParameterDTO">			
+		resultType="com.popup.project.board.promotion.dto.PromotionBoardDTO"
+		parameterType="com.popup.project.board.promotion.dto.PromotionParameterDTO">			
 		SELECT * FROM (
 		    SELECT Tb.*, rownum rNum FROM (
 		        SELECT * FROM PROMOTION_BOARD 
@@ -53,7 +53,7 @@
 	-->
 	
 	<!-- 입력 : @Param 어노테이션으로 변경된 이름으로 인파라미터를 설정한다. --> 	 
-	<insert id="write" parameterType="com.popup.project.board.promotion.dto.SimpleBbsDTO">
+	<insert id="write" parameterType="com.popup.project.board.promotion.dto.PromotionBoardDTO">
 		INSERT INTO PROMOTION_BOARD (promotion_num, user_nick, promotion_title, promotion_content, promotion_ofile, promotion_sfile)
 		VALUES
 		(promotion_board_seq.nextval, #{user_nick, jdbcType=VARCHAR}, #{promotion_title, jdbcType=VARCHAR}, #{promotion_content, jdbcType=VARCHAR}, #{promotion_ofile, jdbcType=VARCHAR}, #{promotion_sfile, jdbcType=VARCHAR})
@@ -62,8 +62,8 @@
 	<!--  
 	내용보기 : DTO에 저장된 promotion_num값을 인파라미터로 설정한 후 쿼리를 실행한다. 
 	-->
-	<select id="view" resultType="com.popup.project.board.promotion.dto.SimpleBbsDTO" 
-		parameterType="com.popup.project.board.promotion.dto.SimpleBbsDTO">
+	<select id="view" resultType="com.popup.project.board.promotion.dto.PromotionBoardDTO" 
+		parameterType="com.popup.project.board.promotion.dto.PromotionBoardDTO">
 		SELECT * FROM PROMOTION_BOARD WHERE promotion_num=#{promotion_num}
 	</select>	
 	
@@ -86,7 +86,7 @@
 	<!--  
 	수정 : DTO에 저장된 내용으로 인파라미터 설정 
 	-->
-	<update id="edit" parameterType="com.popup.project.board.promotion.dto.SimpleBbsDTO">
+	<update id="edit" parameterType="com.popup.project.board.promotion.dto.PromotionBoardDTO">
 	    UPDATE PROMOTION_BOARD SET 
 			user_nick=#{user_nick, jdbcType=VARCHAR}, 
 		    promotion_title=#{promotion_title, jdbcType=VARCHAR}, 
