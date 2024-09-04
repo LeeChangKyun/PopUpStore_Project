@@ -14,81 +14,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	<link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css">
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #343a40;
-        }
-        .header {
-            display: flex;
-            align-items: center;
-            padding: 10px 100px;
-            border-bottom: 1px solid #ddd;
-            justify-content: space-between;
-            background-color: #000;
-            color: #fff;
-        }
-
-        .nav {
-            display: flex;
-            gap: 50px;
-            align-items: center;
-            justify-content: center;
-            flex-grow: 1;
-        }
-        .nav a, .nav .dropdown-toggle {
-            text-decoration: none;
-            color: #fff;
-            font-size: 16px;
-            background: none;
-            display: flex;
-            align-items: center;
-            line-height: 1.5;
-            letter-spacing: 0.5px;
-        }
-        .nav .dropdown-menu {
-            display: none;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            top: 100%;
-            z-index: 1000;
-        }
-        .nav .dropdown-menu.show {
-            display: block;
-        }
-        .nav a.beta {
-            color: #2196F3;
-            background-color: #E3F2FD;
-            padding: 3px 5px;
-            border-radius: 3px;
-        }
-        .nav .dropdown-toggle {
-            outline: none;
-            box-shadow: none;
-            border-color: transparent;
-        }
-        .nav .dropdown-toggle:hover {
-            color: #2196F3;
-        }
-        .auth {
-            display: flex;
-            gap: 15px;
-            margin-left: 20px;
-        }
-        .auth a {
-            text-decoration: none;
-            color: #fff;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-        }
-        .auth button {
-            background: none;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-        }
+        
         .dropdown-toggle::after {
             content: none;
         }
@@ -100,23 +26,7 @@
             color: #fff;
             padding: 5px 10px;
         }
-        footer {
-            background-color: #000;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-            border-top: 1px solid #ddd;
-        }
-        footer .footer-nav {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 10px;
-        }
-        footer .footer-nav a {
-            text-decoration: none;
-            color: #fff;
-        }
+       
         .table-container {
             margin: 20px auto;
             max-width: 800px;
@@ -234,7 +144,7 @@
 				                (((maps.pageNum-1) * maps.pageSize)	+ loop.index)}" />
 				            	${vNum}
 				            </td>
-				            <td align="left"> 
+				            <td align="center"> 
 				                <a href="/Admin/promotionView?promotion_num=${row.promotion_num}&vNum=${vNum}">${ row.promotion_title }</a> 
 				            </td> 
 				            <td>${ row.user_nick }</td> 

@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.popup.project.board.inquiry.dto.InquiryDTO;
 import com.popup.project.board.inquiry.dto.InquiryBoardService;
 import com.popup.project.board.inquiry.dto.InquirySimpleBbsDTO;
+import com.popup.project.board.promotion.dto.SimpleBbsDTO;
 
 @Service
 public class InquirysBoardService {
@@ -48,18 +49,36 @@ public class InquirysBoardService {
         return dao.write(dto);
     }
 
+    
     public int editPost(InquirySimpleBbsDTO dto, MultipartFile inquiryOfile, String prevOfile) throws IOException {
+        // 새 파일 저장
         if (inquiryOfile != null && !inquiryOfile.isEmpty()) {
-            String savedOfileName = fileUploadService.saveFile(inquiryOfile);
+            // 기존 파일 삭제 (이전 파일이 있는 경우)
+            if (prevOfile != null && !prevOfile.trim().isEmpty()) {
+                try {
+                    fileUploadService.deleteFile(prevOfile);
+                } catch (IllegalArgumentException e) {
+                    // 예외 처리: 로그를 남기거나 다른 처리를 수행
+                    System.err.println("Error deleting file: " + e.getMessage());
+                    // 필요 시, 예외를 다시 던지거나 적절한 조치를 취할 수 있습니다.
+                    throw new IOException("Failed to delete previous file: " + prevOfile, e);
+                }
+            }
+
+            // 새 파일 저장
+            String savedFileName = fileUploadService.saveFile(inquiryOfile);
             dto.setInquiry_ofile(fileUploadService.getOriginalFileName(inquiryOfile));
-            dto.setInquiry_sfile(savedOfileName);
-            
-            fileUploadService.deleteFile(prevOfile);
+            dto.setInquiry_sfile(savedFileName);
         } else {
+            // 파일이 없으면 이전 파일 이름을 그대로 사용
             dto.setInquiry_ofile(prevOfile);
         }
+
+        // 게시글 업데이트 로직
         return dao.edit(dto);
     }
+    
+
 
     public int inquirydeletePost(String inquiryNum) {
         return dao.inquiryDelete(inquiryNum);
@@ -72,4 +91,6 @@ public class InquirysBoardService {
     public void incrementDownCount(String inquiryNum) {
         dao.incrementDownCount(inquiryNum);
     }
+
+	
 }
