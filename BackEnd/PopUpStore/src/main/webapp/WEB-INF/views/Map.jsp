@@ -172,7 +172,7 @@
                     popupTitle: '코난',
                     popupContent:'서울의 대표적인 수족관입니다.',
                     image: 'image/Popup/copost3.jpg',
-                    date: '2024-00-00',
+                    date: '24.08.01 - 24.08.11',
                     link: '/PopupDetail'
                 },
                 {
@@ -180,7 +180,7 @@
                     popupTitle: '지브리',
                     popupContent: '현대적이고 스타일리시한 쇼핑 공간입니다.',
                     image: 'image/Popup/any1.jpg',
-                    date: '2024-00-002',
+                    date: '24.04.26 - 24.08.03',
                     link: '/PopupDetail2'
                 },
                 {
@@ -188,7 +188,7 @@
                     popupTitle: '배틀그라운드',
                     popupContent: '트렌디한 패션 아이템이 가득한 매장입니다.',
                     image: 'image/Popup/battle1.png',
-                    date: '2024-00-001',
+                    date: '24.04.26 - 24.08.03',
                     link: '/PopupDetail3'
                 },
 //                 // 사용하지 않은 주소들
