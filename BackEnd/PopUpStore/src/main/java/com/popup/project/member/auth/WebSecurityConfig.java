@@ -63,6 +63,13 @@ public class WebSecurityConfig {
             // 로그인 성공 시 실패 횟수 초기화
             userService.resetFailedAttempts(userDetails.getUsername());
 
+            // 계정이 잠겨 있으면 추가 인증 페이지로 리다이렉트
+            if (userDetails.getUser().isAccountLocked()) {
+                response.sendRedirect("/Member/auth/AccountAuth");  // 추가 인증 페이지로 리다이렉트
+                return;
+            }
+
+            // 관리자일 경우
             if (userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
                 response.sendRedirect("/Admin/Home?adminLogin=true");
             } else {
@@ -97,6 +104,7 @@ public class WebSecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(request -> request
                 .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
+                .requestMatchers("/Member/auth/AccountAuth").permitAll() // 인증 없이 접근 가능하도록 설정
                 .requestMatchers("/Admin/**").hasRole("ADMIN")
                 .requestMatchers("/Member/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/promotionList", "/promotionWrite", "/promotionView", "/promotionEdit").hasAnyRole("USER", "ADMIN")
@@ -132,7 +140,13 @@ public class WebSecurityConfig {
                     if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
                         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                     } else {
-                        response.sendRedirect("/Guest/auth/Login");
+                    	String requestURI = request.getRequestURI();
+                        if (requestURI.equals("/Member/auth/AccountAuth")) {
+                            System.out.println("Requesting /Member/auth/AccountAuth");
+                            response.sendRedirect("/Member/auth/AccountAuth");
+                        } else {
+                            response.sendRedirect("/Guest/auth/Login");
+                        }
                     }
                 })
                 .accessDeniedPage("/denied.do")

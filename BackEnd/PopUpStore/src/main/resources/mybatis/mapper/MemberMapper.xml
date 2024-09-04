@@ -106,7 +106,9 @@
 	        USER_ADDRESS as userAddress,
 	        USER_CREATE_DATE as userCreatedate,
 	        AUTHORITY as userAuthority,
-	        ENABLED as enabled
+	        ENABLED as enabled,
+	        FAILED_ATTEMPTS as failedAttempts,
+	        ACCOUNT_LOCKED AS accountLocked
 	    FROM users 
 	    WHERE user_id = #{userId}
 	</select>
@@ -215,5 +217,17 @@
 	    FROM USERS
 	    WHERE USER_ID = #{userId}
 	</select>
+	
+	<update id="unlockAccountByEmail">
+	    UPDATE USERS
+	    SET ACCOUNT_LOCKED = 0, FAILED_ATTEMPTS = 0
+	    WHERE USER_EMAIL = #{email}
+	</update>
+	
+	<update id="resetFailedAttemptsByEmail">
+	    UPDATE USERS
+	    SET FAILED_ATTEMPTS = 0
+	    WHERE USER_EMAIL = #{email}
+	</update>
 	
 </mapper>

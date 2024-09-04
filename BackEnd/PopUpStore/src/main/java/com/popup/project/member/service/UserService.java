@@ -1,10 +1,13 @@
 package com.popup.project.member.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
 import com.popup.project.member.dto.UserDTO;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface UserService {
 
@@ -31,7 +34,7 @@ public interface UserService {
     // 소셜 로그인 사용자 등록 메서드 추가
     void registerSocialUser(UserDTO user);
     
-    public void increaseFailedAttempts(UserDTO user);
+    public void increaseFailedAttempts(UserDTO user, HttpServletResponse response) throws IOException;
     
     public void resetFailedAttempts(String userId);
     
@@ -40,5 +43,9 @@ public interface UserService {
     public void unlockAccount(String userId);
     
     String getUserAuthority(@Param("userId") String userId);
+    
+    public boolean login(String userId, String password, HttpServletResponse response);
+    
+    public void unlockAccountByEmailAndResetAttempts(String email);    
     
 }

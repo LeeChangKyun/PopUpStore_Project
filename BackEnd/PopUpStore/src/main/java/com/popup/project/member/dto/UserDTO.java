@@ -57,4 +57,13 @@ public class UserDTO {
     
     private boolean accountLocked;   // 계정 잠김 여부
     
+    // account_locked가 1이면 true, 0이면 false로 변환
+    public boolean isAccountLocked() {
+        return accountLocked;
+    }
+
+    public void setAccountLocked(int accountLocked) {
+        this.accountLocked = (accountLocked == 1);
+        System.out.println("accountLocked 값이 설정되었습니다: " + this.accountLocked);
+    }
 }
