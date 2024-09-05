@@ -77,7 +77,7 @@ public class PromotionController {
         String searchField = req.getParameter("searchField");
         String searchKeyword = req.getParameter("searchKeyword");
 
-        String pagingImg = pagingService.generatePaging(totalCount, pageNum, req.getContextPath() + "/" + rolePath + "/promotion/promotionList?", searchField, searchKeyword);
+        String pagingImg = pagingService.generatePaging(totalCount, pageNum, req.getContextPath() + "/" + rolePath + "/promotionList?", searchField, searchKeyword);
         model.addAttribute("pagingImg", pagingImg);
 
         model.addAttribute("searchField", searchField);
