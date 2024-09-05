@@ -431,7 +431,7 @@
 
             <!-- 댓글 목록 -->
             <div class="divider"></div> <!-- 구분선 추가 -->
-            <div id="comment-list" class="comment-list">
+            <div id="comment-list" class="comment-list" style="display: none;">
                 <c:forEach items="${comments}" var="comment">
                     <div class="comment-item">
                         <p class="comment-meta">작성자: ${comment.user_nick} | 작성일: ${comment.created_at}</p>
