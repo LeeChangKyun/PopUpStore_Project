@@ -275,18 +275,9 @@
 	        });
 	    });
 	    
-	    document.addEventListener("DOMContentLoaded", function() {
-	        const urlParams = new URLSearchParams(window.location.search);
-
-	        console.log("현재 URL: ", window.location.href);  // 현재 URL 출력
-
-	        // 계정이 잠겨 있을 때 alert 창 표시
-	        if (urlParams.get('locked') === 'true') {
-	            alert("계정이 비활성화되었습니다! 이메일로 받은 인증 코드를 입력하세요.");
-	        } else {
-	            console.log("locked 파라미터가 없습니다.");
-	        }
-	    });
+	    window.onload = function() {
+	        alert("계정이 비활성화 되었습니다. 인증 처리 후 계정이 활성화됩니다.");
+	    };
 	    
     </script>
 
