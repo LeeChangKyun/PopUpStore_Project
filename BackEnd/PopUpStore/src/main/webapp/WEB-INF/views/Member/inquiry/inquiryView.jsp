@@ -431,7 +431,7 @@
 
             <!-- 댓글 목록 -->
             <div class="divider"></div> <!-- 구분선 추가 -->
-            <div id="comment-list" class="comment-list">
+            <div id="comment-list" class="comment-list" style="display: none;">
                 <c:forEach items="${comments}" var="comment">
                     <div class="comment-item">
                         <p class="comment-meta">작성자: ${comment.user_nick} | 작성일: ${comment.created_at}</p>
@@ -483,20 +483,20 @@
     <br/>
     <!-- 댓글 토글 -->
     <script>
-	    function toggleComments() {
-	        var commentList = document.getElementById('comment-list');
-	        var icon = document.getElementById('comment-toggle-icon');
-	
-	        // 현재 상태에 따라 댓글 목록을 보이거나 숨김
-	        if (commentList.style.display === 'none' || commentList.style.display === '') {
-	            commentList.style.display = 'block';
-	            icon.style.color = '#2196F3'; // 아이콘 색상 변경 (보임 상태)
-	        } else {
-	            commentList.style.display = 'none';
-	            icon.style.color = '#060606'; // 아이콘 색상 변경 (숨김 상태)
-	        }
-	    }
-</script>
+    function toggleComments() {
+        var commentList = document.getElementById('comment-list');
+        var icon = document.getElementById('comment-toggle-icon');
+
+        // 현재 상태에 따라 댓글 목록을 보이거나 숨김
+        if (commentList.style.display === 'none' || commentList.style.display === '') {
+            commentList.style.display = 'block';
+            icon.style.color = '#2196F3'; // 아이콘 색상 변경 (보임 상태)
+        } else {
+            commentList.style.display = 'none';
+            icon.style.color = '#060606'; // 아이콘 색상 변경 (숨김 상태)
+        }
+    }
+	</script>
 
     <!-- 푸터 시작 -->
     <%@ include file="/WEB-INF/views/Common/footer.jsp" %>
