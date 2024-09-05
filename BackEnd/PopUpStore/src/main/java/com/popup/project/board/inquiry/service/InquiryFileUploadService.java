@@ -36,11 +36,21 @@ public class InquiryFileUploadService {
     }
     
     public void deleteFile(String fileName) throws IOException {
+        if (fileName == null || fileName.trim().isEmpty()) {
+            throw new IllegalArgumentException("File name cannot be null or empty");
+        }
+
+        // 파일의 절대 경로를 계산
         File file = new File(uploadDir, fileName);
-        if (file.exists()) {
-            if (!file.delete()) {
-                throw new IOException("File deletion failed");
-            }
+
+        if (!file.exists()) {
+            // 파일이 존재하지 않으면 경고 로그를 남기고 예외를 발생시킵니다
+            System.err.println("File does not exist: " + file.getAbsolutePath());
+            return; // 파일이 없어도 계속 진행할 수 있습니다
+        }
+
+        if (!file.delete()) {
+            throw new IOException("Failed to delete file: " + file.getAbsolutePath());
         }
     }
 }
