@@ -106,7 +106,10 @@
 	        USER_ADDRESS as userAddress,
 	        USER_CREATE_DATE as userCreatedate,
 	        AUTHORITY as userAuthority,
-	        ENABLED as enabled
+	        ENABLED as enabled,
+	        SOCIAL_ID as socialId,
+	        SOCIAL_PROVIDER as socialProvider,
+	        SOCIAL_EMAIL as socialEmail
 	    FROM users 
 	    WHERE user_id = #{userId}
 	</select>

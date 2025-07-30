@@ -30,4 +30,19 @@ public interface UserService {
 
     // 소셜 로그인 사용자 등록 메서드 추가
     void registerSocialUser(UserDTO user);
+    
+    // 소셜 로그인 사용자 조회 메서드 추가
+    UserDTO findBySocialIdAndProvider(@Param("socialId") String socialId, @Param("provider") String provider);
+    
+    // 소셜 로그인 사용자 정보 업데이트 메서드 추가
+    int updateUserBySocialIdAndProvider(UserDTO user);
+    
+    // 일반 사용자 정보 업데이트 메서드 추가
+    int updateUserInfo(UserDTO user);
+    
+    // 사용자 삭제 메서드 추가
+    int deleteUserById(String userId);
+    
+    // 사용자 검색 메서드 추가 (관리자용)
+    List<UserDTO> searchUsersByIdOrNickname(@Param("query") String query);
 }

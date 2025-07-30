@@ -11,21 +11,33 @@
 	           user_email AS userEmail,
 	           user_phone AS userPhone,
 	           user_address AS userAddress,
-	           user_create_date AS userCreatedate  <!-- 이 부분이 중요합니다. -->
+	           user_create_date AS userCreatedate,
+	           authority AS userAuthority,
+	           enabled AS enabled,
+	           social_id AS socialId,
+	           social_provider AS socialProvider,
+	           social_email AS socialEmail
 	    FROM USERS
 	</select>
 	
-	<resultMap id="userResultMap" type="com.popup.project.member.dto.UserDTO">
+		<resultMap id="userResultMap" type="com.popup.project.member.dto.UserDTO">
 	    <result property="userId" column="USER_ID"/>
 	    <result property="userNick" column="USER_NICK"/>
 	    <result property="userEmail" column="USER_EMAIL"/>
 	    <result property="userPhone" column="USER_PHONE"/>
 	    <result property="userAddress" column="USER_ADDRESS"/>
 	    <result property="userCreatedate" column="USER_CREATE_DATE"/>
+	    <result property="userAuthority" column="AUTHORITY"/>
+	    <result property="enabled" column="ENABLED"/>
+	    <result property="socialId" column="SOCIAL_ID"/>
+	    <result property="socialProvider" column="SOCIAL_PROVIDER"/>
+	    <result property="socialEmail" column="SOCIAL_EMAIL"/>
 	</resultMap>
-	
+
 	<select id="searchUsersByIdOrNickname" resultMap="userResultMap">
-	  SELECT * FROM USERS
+	  SELECT USER_ID, USER_NICK, USER_EMAIL, USER_PHONE, USER_ADDRESS, USER_CREATE_DATE, 
+	         AUTHORITY, ENABLED, SOCIAL_ID, SOCIAL_PROVIDER, SOCIAL_EMAIL
+	  FROM USERS
 	  WHERE USER_ID LIKE '%' || #{query} || '%'
 	  OR USER_NICK LIKE '%' || #{query} || '%'
 	</select>
